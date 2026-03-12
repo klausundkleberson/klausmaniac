@@ -543,9 +543,7 @@ async function logout() {
 }
 
 function showDashboard(user) {
-  document.getElementById('authArea').style.display  = 'none';
-  document.getElementById('dashboard').style.display = '';
-  document.getElementById('userEmail').textContent   = user.email;
+  window.location.href = '../profile/';
 }
 
 function showAuth() {

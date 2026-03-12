@@ -299,6 +299,18 @@ const SUPABASE_URL = 'https://tovruvmgqfsesyvlrxjr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+const STAKE_SUGGESTIONS = {
+  geld:       ['5€', '10€', '20€', '50€', '100€', 'Loser zahlt alles', 'Nächste Runde'],
+  gegenstand: ['Ein Sixpack', 'Mein Lieblingsshirt', 'Eine Flasche Whisky', 'Meine Sonnenbrille', 'Meine AirPods', 'Eine Schachtel Pralinen', 'Wunschgegenstand'],
+  aufgabe:    ['50 Liegestütze', '100 Kniebeugen', '5km Laufen', 'Plank 3 Minuten', '30 Burpees', '20 Klimmzüge', 'Eisbad 1 Minute', '10km Fahrrad'],
+  getraenke:  ['1 Bier ausgeben', '3 Bier ausgeben', 'Runde Shots', 'Runde für alle', 'Energy Drinks für alle', '1 Woche keinen Alkohol', 'Lieblingsgetränk des Gewinners'],
+  essen:      ['Pizza für alle', 'McDonald\'s für den Gewinner', 'Döner ausgeben', 'Selbst kochen', 'Kuchen backen', 'Frühstück machen', 'Sushi bestellen'],
+  pflicht:    ['Shirtlos zum Bäcker', '1 Stunde als Butler', 'Profilbild 1 Monat peinlich', 'Liebeserklärung öffentlich', 'Tanzvideo posten', 'Peinlicher Status 1 Woche', 'Wunschpflicht des Gewinners'],
+  gaming:     ['1v1 in FIFA', '1v1 in Warzone', 'Loser deinstalliert 1 Woche', 'Gewinner wählt Game-Mode', 'Full Carry nächstes Match', '1v1 in Rocket League', 'Loser spielt auf schlechtem Account'],
+  titel:      ['König der Woche', 'Offizieller Verlierer', 'GG-Lord', 'Trash-Talk-Meister', 'Letzter Platz 👑', 'Bettlerkönig', 'MVP des Monats'],
+  haushalt:   ['Küche putzen 1 Monat', 'Geschirrspüler 2 Wochen', 'Einkaufen gehen', 'Bad putzen', 'Müll rausbringen 1 Monat', 'Staubsaugen 1 Monat', 'Wäsche waschen & falten'],
+};
+
 const STAKE_TYPES = [
   { id: 'kloins',    icon: '💰', label: 'Kloins',         placeholder: 'Betrag (z.B. 200)',       isKloins: true  },
   { id: 'geld',      icon: '💵', label: 'Geld',           placeholder: 'z.B. 20€',                isKloins: false },
@@ -497,18 +509,31 @@ function selectJoinStake(id) {
 function renderJoinFields(id) {
   const type = STAKE_TYPES.find(t => t.id === id);
   const el = document.getElementById('joinStakeFields');
+  const inputStyle = 'width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:9px;padding:0.7rem 0.9rem;color:var(--text);font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.2s';
+  const labelStyle = 'display:block;font-size:0.75rem;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem';
+  const pillStyle = 'padding:0.3rem 0.7rem;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:#666;font-size:0.75rem;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;transition:all 0.15s';
+
   if (type.isKloins) {
     el.innerHTML = `
-      <label style="display:block;font-size:0.75rem;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem">Betrag (Kloins) *</label>
-      <input type="text" id="joinAmount" placeholder="z.B. 100" maxlength="7" value="100"
-        style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:9px;padding:0.7rem 0.9rem;color:var(--text);font-size:0.95rem;font-family:inherit;margin-bottom:0.5rem">
+      <label style="${labelStyle}">Betrag (Kloins) *</label>
+      <input type="text" id="joinAmount" placeholder="z.B. 100" maxlength="7" value="100" style="${inputStyle};margin-bottom:0.5rem">
       <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.8rem">Kontostand: <span style="color:var(--neon-yellow);font-weight:800">${userKloins.toLocaleString('de-DE')}</span> Kloins</div>`;
   } else {
+    const suggestions = STAKE_SUGGESTIONS[id] || [];
+    const pillsHtml = suggestions.length ? `
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;margin-bottom:0.8rem">
+        ${suggestions.map(s => `<button style="${pillStyle}" onclick="pickJoinSuggestion('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('')}
+      </div>` : '<div style="margin-bottom:0.8rem"></div>';
     el.innerHTML = `
-      <label style="display:block;font-size:0.75rem;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem">${type.label} *</label>
-      <input type="text" id="joinStakeDesc" placeholder="${type.placeholder}" maxlength="150"
-        style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:9px;padding:0.7rem 0.9rem;color:var(--text);font-size:0.95rem;font-family:inherit;margin-bottom:0.8rem">`;
+      <label style="${labelStyle}">${type.label} *</label>
+      <input type="text" id="joinStakeDesc" placeholder="${type.placeholder}" maxlength="150" style="${inputStyle}">
+      ${pillsHtml}`;
   }
+}
+
+function pickJoinSuggestion(value) {
+  const input = document.getElementById('joinStakeDesc');
+  if (input) { input.value = value; input.focus(); }
 }
 
 function selectJoinSide(side) {

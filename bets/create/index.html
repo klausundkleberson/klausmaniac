@@ -129,6 +129,17 @@
   .stake-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; }
   .stake-hint .kloins-val { color: var(--neon-yellow); font-weight: 800; }
 
+  .suggestions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.55rem; }
+  .suggestion-pill {
+    padding: 0.3rem 0.7rem; border-radius: 999px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+    color: #666; font-size: 0.75rem; font-weight: 600;
+    font-family: inherit; cursor: pointer; transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .suggestion-pill:hover { border-color: rgba(255,255,255,0.2); color: var(--text); background: rgba(255,255,255,0.06); }
+  .suggestion-pill.used { border-color: rgba(245,255,0,0.35); color: var(--neon-yellow); background: rgba(245,255,0,0.07); }
+
   .alert { display: none; padding: 0.7rem 0.9rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; }
   .alert.error   { display: block; background: rgba(255,0,60,0.1); border: 1px solid rgba(255,0,60,0.3); color: #ff6b8a; }
   .alert.success { display: block; background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25); color: var(--neon-green); }
@@ -313,6 +324,19 @@ function randomName(side) {
   setTimeout(() => { input.style.transform = ''; }, 120);
 }
 
+// ── Stake Suggestions ────────────────────────────────────────────────────────
+const STAKE_SUGGESTIONS = {
+  geld:       ['5€', '10€', '20€', '50€', '100€', 'Loser zahlt alles', 'Nächste Runde'],
+  gegenstand: ['Ein Sixpack', 'Mein Lieblingsshirt', 'Eine Flasche Whisky', 'Meine Sonnenbrille', 'Meine AirPods', 'Eine Schachtel Pralinen', 'Wunschgegenstand'],
+  aufgabe:    ['50 Liegestütze', '100 Kniebeugen', '5km Laufen', 'Plank 3 Minuten', '30 Burpees', '20 Klimmzüge', 'Eisbad 1 Minute', '10km Fahrrad'],
+  getraenke:  ['1 Bier ausgeben', '3 Bier ausgeben', 'Runde Shots', 'Runde für alle', 'Energy Drinks für alle', '1 Woche keinen Alkohol', 'Lieblingsgetränk des Gewinners'],
+  essen:      ['Pizza für alle', 'McDonald\'s für den Gewinner', 'Döner ausgeben', 'Selbst kochen', 'Kuchen backen', 'Frühstück machen', 'Sushi bestellen'],
+  pflicht:    ['Shirtlos zum Bäcker', '1 Stunde als Butler', 'Profilbild 1 Monat peinlich', 'Liebeserklärung öffentlich', 'Tanzvideo posten', 'Peinlicher Status 1 Woche', 'Wunschpflicht des Gewinners'],
+  gaming:     ['1v1 in FIFA', '1v1 in Warzone', 'Loser deinstalliert 1 Woche', 'Gewinner wählt Game-Mode', 'Full Carry nächstes Match', '1v1 in Rocket League', 'Loser spielt auf schlechtem Account'],
+  titel:      ['König der Woche', 'Offizieller Verlierer', 'GG-Lord', 'Trash-Talk-Meister', 'Letzter Platz 👑', 'Bettlerkönig', 'MVP des Monats'],
+  haushalt:   ['Küche putzen 1 Monat', 'Geschirrspüler 2 Wochen', 'Einkaufen gehen', 'Bad putzen', 'Müll rausbringen 1 Monat', 'Staubsaugen 1 Monat', 'Wäsche waschen & falten'],
+};
+
 // ── Stake Types ───────────────────────────────────────────────────────────────
 const STAKE_TYPES = [
   { id: 'kloins',    icon: '💰', label: 'Kloins',         placeholder: 'Betrag (z.B. 200)',      hint: null,                        isKloins: true  },
@@ -363,13 +387,28 @@ function renderStakeFields(id) {
       <div class="stake-hint">Dein Kontostand: <span class="kloins-val" id="kloinsBalance">…</span> Kloins</div>`;
     document.getElementById('kloinsBalance').textContent = userKloins.toLocaleString('de-DE');
   } else {
+    const suggestions = STAKE_SUGGESTIONS[id] || [];
     fields.innerHTML = `
-      <div class="form-group" style="margin-bottom:0.5rem">
+      <div class="form-group" style="margin-bottom:0.4rem">
         <label>${type.label} *</label>
         <input type="text" id="fStakeDesc" placeholder="${type.placeholder}" maxlength="150">
       </div>
-      ${type.hint ? `<div class="stake-hint">${type.hint}</div>` : ''}`;
+      ${suggestions.length ? `
+        <div class="suggestions" id="suggestionPills">
+          ${suggestions.map(s => `<button class="suggestion-pill" onclick="pickSuggestion('fStakeDesc','${s.replace(/'/g,"\\'")}')">${s}</button>`).join('')}
+        </div>` : ''}
+      ${type.hint ? `<div class="stake-hint" style="margin-top:0.5rem">${type.hint}</div>` : ''}`;
   }
+}
+
+function pickSuggestion(inputId, value) {
+  const input = document.getElementById(inputId);
+  input.value = value;
+  // Mark pill as used
+  document.querySelectorAll('#suggestionPills .suggestion-pill').forEach(p => {
+    p.classList.toggle('used', p.textContent === value);
+  });
+  input.focus();
 }
 
 async function init() {

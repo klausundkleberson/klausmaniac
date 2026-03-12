@@ -433,7 +433,6 @@ function selectEmoji(emoji) {
   document.getElementById('avatarEmoji').style.display = '';
   document.getElementById('avatarImg').style.display = 'none';
   const nav = document.getElementById('navAvatar');
-  nav.textContent = '';
   nav.textContent = emoji;
   document.querySelectorAll('.emoji-option').forEach(el => el.classList.toggle('selected', el.textContent === emoji));
   document.getElementById('emojiPicker').classList.remove('open');
@@ -542,7 +541,7 @@ async function saveProfile() {
   if (!username) { showAlert('Bitte gib einen Anzeigenamen ein.', 'error'); return; }
   const payload = {
     id: currentUser.id, username,
-    avatar: avatarImageUrl ? null : selectedEmoji,
+    ...(avatarImageUrl ? {} : { avatar: selectedEmoji, avatar_url: null }),
     siegesspruch_1: document.getElementById('s1').value.trim() || null,
     siegesspruch_2: document.getElementById('s2').value.trim() || null,
     siegesspruch_3: document.getElementById('s3').value.trim() || null,

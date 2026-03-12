@@ -48,6 +48,7 @@
   .navbar-right { display: flex; align-items: center; gap: 0.75rem; }
   .nav-avatar { width: 32px; height: 32px; background: var(--bg); border: 1.5px solid var(--neon-orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; box-shadow: 0 0 10px rgba(255,106,0,0.25); text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; }
   .nav-avatar:hover { transform: scale(1.1); box-shadow: 0 0 16px rgba(255,106,0,0.4); }
+  .nav-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .btn-logout { background: transparent; border: 1px solid #1e1e1e; color: var(--muted); padding: 0.35rem 0.8rem; border-radius: 7px; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
   .btn-logout:hover { border-color: var(--neon-red); color: var(--neon-red); }
 
@@ -354,7 +355,7 @@ async function init() {
   const [betRes, partRes, profileRes] = await Promise.all([
     sb.from('bets').select('*').eq('id', betId).single(),
     sb.from('bet_participants').select('*').eq('bet_id', betId),
-    sb.from('profiles').select('id, username, avatar, kloins').eq('id', currentUser.id).single()
+    sb.from('profiles').select('id, username, avatar, avatar_url, kloins').eq('id', currentUser.id).single()
   ]);
 
   if (betRes.error || !betRes.data) { window.location.href = '../../bets/'; return; }
@@ -362,7 +363,7 @@ async function init() {
   participants = partRes.data || [];
 
   if (profileRes.data) {
-    if (profileRes.data.avatar) document.getElementById('navAvatar').textContent = profileRes.data.avatar;
+    setNavAvatar(document.getElementById('navAvatar'), profileRes.data);
     userKloins = profileRes.data.kloins ?? 1000;
   }
 
@@ -772,6 +773,18 @@ function showAlert(msg, type) {
   const el = document.getElementById('alertBox');
   el.textContent = msg; el.className = 'alert ' + type;
   if (type === 'error') setTimeout(() => { el.className = 'alert'; }, 4000);
+}
+
+function setNavAvatar(el, profile) {
+  if (!profile) return;
+  if (profile.avatar_url) {
+    el.textContent = '';
+    const img = document.createElement('img');
+    img.src = profile.avatar_url;
+    el.appendChild(img);
+  } else if (profile.avatar) {
+    el.textContent = profile.avatar;
+  }
 }
 
 init();

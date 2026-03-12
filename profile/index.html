@@ -29,301 +29,163 @@
     background: var(--bg);
     min-height: 100vh;
     color: var(--text);
-    padding: 2rem 1rem;
     position: relative;
     overflow-x: hidden;
   }
 
-  /* Blobs */
-  .blob {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    pointer-events: none;
-    opacity: 0.45;
-    z-index: 0;
-  }
+  .blob { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.45; z-index: 0; }
   .blob-1 { width: 400px; height: 400px; top: -10%; left: -10%; background: var(--neon-blue);   animation: drift1 9s ease-in-out infinite alternate; }
   .blob-2 { width: 300px; height: 300px; bottom: -5%; right: -5%; background: var(--neon-orange); animation: drift2 11s ease-in-out infinite alternate; }
-
   @keyframes drift1 { from { transform: translate(0,0); } to { transform: translate(30px,40px); } }
   @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-40px,-30px); } }
 
   .grid {
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 36px 36px;
-    pointer-events: none;
-    z-index: 0;
+    position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 36px 36px; pointer-events: none; z-index: 0;
   }
 
-  /* Layout */
-  .page {
-    position: relative;
-    z-index: 10;
-    max-width: 600px;
-    margin: 0 auto;
+  /* ── Navbar ── */
+  .navbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(5,5,8,0.8); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem; height: 58px;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   }
+  .navbar-left { display: flex; align-items: center; gap: 2rem; }
 
-  /* Header */
-  .top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-  }
+  .logo { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.03em; text-decoration: none; color: var(--text); flex-shrink: 0; }
+  .logo span { color: var(--neon-yellow); text-shadow: 0 0 10px rgba(245,255,0,0.5); }
 
-  .logo {
-    font-size: 1.2rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-  }
+  .nav-links { display: flex; align-items: center; gap: 0.25rem; }
 
-  .logo span {
-    color: var(--neon-yellow);
-    text-shadow: 0 0 10px rgba(245,255,0,0.5);
+  .nav-link {
+    display: flex; align-items: center; gap: 0.4rem;
+    padding: 0.4rem 0.75rem; border-radius: 8px;
+    font-size: 0.85rem; font-weight: 600; color: var(--muted);
+    text-decoration: none; transition: all 0.2s; white-space: nowrap;
   }
+  .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  .nav-link.active { color: var(--text); background: rgba(255,255,255,0.07); }
+  .nav-link.active .nav-dot { opacity: 1; }
+  .nav-dot { width: 5px; height: 5px; border-radius: 50%; opacity: 0; transition: opacity 0.2s; }
+  .nav-link-soon { font-size: 0.58rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #333; background: rgba(255,255,255,0.05); border: 1px solid #1a1a1a; padding: 0.1rem 0.35rem; border-radius: 4px; }
+
+  .navbar-right { display: flex; align-items: center; gap: 0.75rem; }
+  .nav-avatar {
+    width: 32px; height: 32px; background: var(--bg);
+    border: 1.5px solid var(--neon-orange); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; cursor: pointer;
+    box-shadow: 0 0 10px rgba(255,106,0,0.25); text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .nav-avatar:hover { transform: scale(1.1); box-shadow: 0 0 16px rgba(255,106,0,0.4); }
 
   .btn-logout {
-    background: transparent;
-    border: 1px solid #222;
-    color: var(--muted);
-    padding: 0.4rem 0.9rem;
-    border-radius: 8px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.2s;
+    background: transparent; border: 1px solid #1e1e1e; color: var(--muted);
+    padding: 0.35rem 0.8rem; border-radius: 7px; font-size: 0.8rem;
+    font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s;
   }
   .btn-logout:hover { border-color: var(--neon-red); color: var(--neon-red); }
 
+  /* ── Page ── */
+  .page { position: relative; z-index: 10; max-width: 600px; margin: 0 auto; padding: 2.5rem 1rem; }
+
   /* Avatar Section */
   .avatar-section {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 1.8rem;
-    margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: 1.5rem;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 1.8rem; margin-bottom: 1.2rem;
+    animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
   }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 
   .avatar-display {
-    width: 90px;
-    height: 90px;
-    background: var(--bg);
-    border: 2px solid var(--neon-orange);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    flex-shrink: 0;
+    width: 90px; height: 90px; background: var(--bg);
+    border: 2px solid var(--neon-orange); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; flex-shrink: 0;
     box-shadow: 0 0 20px rgba(255,106,0,0.4), 0 0 50px rgba(255,106,0,0.15);
-    cursor: pointer;
-    transition: transform 0.2s;
-    position: relative;
+    cursor: pointer; transition: transform 0.2s; position: relative;
   }
-
   .avatar-display:hover { transform: scale(1.05); }
-
   .avatar-edit-hint {
-    position: absolute;
-    bottom: -4px;
-    right: -4px;
-    width: 26px;
-    height: 26px;
-    background: var(--neon-orange);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    color: #000;
+    position: absolute; bottom: -4px; right: -4px;
+    width: 26px; height: 26px; background: var(--neon-orange);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; color: #000;
   }
 
-  .avatar-info h2 {
-    font-size: 1.3rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.2rem;
-  }
+  .avatar-info h2 { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.2rem; }
+  .avatar-info p  { font-size: 0.82rem; color: var(--muted); }
 
-  .avatar-info p { font-size: 0.82rem; color: var(--muted); }
-
-  /* Emoji Picker */
   .emoji-picker {
-    display: none;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 1.2rem;
+    display: none; flex-wrap: wrap; gap: 0.5rem;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1rem; margin-bottom: 1.2rem;
+    animation: fadeUp 0.3s cubic-bezier(0.16,1,0.3,1) both;
   }
   .emoji-picker.open { display: flex; }
 
   .emoji-option {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    border-radius: 10px;
-    cursor: pointer;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid transparent;
-    transition: all 0.15s;
+    width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; border-radius: 10px; cursor: pointer;
+    background: rgba(255,255,255,0.03); border: 1px solid transparent; transition: all 0.15s;
   }
   .emoji-option:hover { background: rgba(255,255,255,0.1); border-color: var(--neon-yellow); transform: scale(1.1); }
   .emoji-option.selected { border-color: var(--neon-orange); background: rgba(255,106,0,0.1); box-shadow: 0 0 10px rgba(255,106,0,0.3); }
 
-  /* Card */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 1.8rem;
-    margin-bottom: 1.2rem;
-  }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) both; }
 
   .card-title {
-    font-size: 0.75rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: 0.5rem;
   }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  .card-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* Form */
   .form-group { margin-bottom: 1rem; }
   .form-group:last-child { margin-bottom: 0; }
 
-  label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #333;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin-bottom: 0.4rem;
-  }
+  label { display: block; font-size: 0.75rem; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.4rem; }
 
   input[type="text"] {
-    width: 100%;
-    background: var(--input-bg);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 0.7rem 0.9rem;
-    color: var(--text);
-    font-size: 0.95rem;
-    font-family: inherit;
-    transition: all 0.2s;
+    width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+    border-radius: 9px; padding: 0.7rem 0.9rem; color: var(--text);
+    font-size: 0.95rem; font-family: inherit; transition: all 0.2s;
   }
-
   input[type="text"]::placeholder { color: #2a2a2a; }
+  input[type="text"]:focus { outline: none; border-color: var(--neon-blue); background: rgba(0,212,255,0.05); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
 
-  input[type="text"]:focus {
-    outline: none;
-    border-color: var(--neon-blue);
-    background: rgba(0,212,255,0.05);
-    box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
-  }
-
-  .spruch-row {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.6rem;
-  }
-
+  .spruch-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
   .spruch-num {
-    width: 24px;
-    height: 24px;
-    background: rgba(245,255,0,0.1);
-    border: 1px solid rgba(245,255,0,0.2);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: var(--neon-yellow);
-    flex-shrink: 0;
+    width: 24px; height: 24px; background: rgba(245,255,0,0.1);
+    border: 1px solid rgba(245,255,0,0.2); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 800; color: var(--neon-yellow); flex-shrink: 0;
   }
 
-  /* Alert */
-  .alert {
-    display: none;
-    padding: 0.7rem 0.9rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    margin-bottom: 1rem;
-    animation: fadeIn 0.2s ease;
-  }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
-
+  .alert { display: none; padding: 0.7rem 0.9rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; animation: fadeUp 0.2s ease; }
   .alert.error   { display: block; background: rgba(255,0,60,0.1);   border: 1px solid rgba(255,0,60,0.3);   color: #ff6b8a; }
   .alert.success { display: block; background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25); color: var(--neon-green); text-shadow: 0 0 8px rgba(0,255,136,0.3); }
 
-  /* Save Button */
   .btn-save {
-    width: 100%;
-    padding: 0.9rem;
-    border: none;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-weight: 800;
-    cursor: pointer;
-    font-family: inherit;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    background: var(--neon-green);
-    color: #000;
-    box-shadow: 0 0 20px rgba(0,255,136,0.3);
-    transition: all 0.2s;
-    margin-top: 0.5rem;
+    width: 100%; padding: 0.9rem; border: none; border-radius: 10px;
+    font-size: 0.95rem; font-weight: 800; cursor: pointer; font-family: inherit;
+    letter-spacing: 0.02em; text-transform: uppercase;
+    background: var(--neon-green); color: #000;
+    box-shadow: 0 0 20px rgba(0,255,136,0.3); transition: all 0.2s; margin-top: 0.5rem;
   }
-
-  .btn-save:hover:not(:disabled) {
-    box-shadow: 0 0 32px rgba(0,255,136,0.55);
-    transform: translateY(-1px);
-  }
-
+  .btn-save:hover:not(:disabled) { box-shadow: 0 0 32px rgba(0,255,136,0.55); transform: translateY(-1px); }
   .btn-save:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-  /* Loading */
   #loadingScreen {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    font-size: 2rem;
-    animation: pulse 1s ease-in-out infinite;
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; font-size: 2rem; animation: pulse 1s ease-in-out infinite;
   }
-
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 </style>
 </head>
@@ -335,80 +197,80 @@
 
 <div id="loadingScreen">⚡</div>
 
-<div class="page" id="mainPage" style="display:none">
+<div id="mainPage" style="display:none">
 
-  <div class="top-bar">
-    <div class="logo" style="cursor:pointer" onclick="window.location.href='../dashboard/'">Klaus<span>Maniac</span></div>
-    <button class="btn-logout" onclick="logout()">Abmelden</button>
-  </div>
-
-  <!-- Avatar -->
-  <div class="avatar-section">
-    <div class="avatar-display" id="avatarDisplay" onclick="toggleEmojiPicker()">
-      <span id="avatarEmoji">🎮</span>
-      <div class="avatar-edit-hint">✏️</div>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a class="logo" href="../dashboard/">Klaus<span>Maniac</span></a>
+      <div class="nav-links">
+        <a class="nav-link" href="../dashboard/">🏠 Home</a>
+        <a class="nav-link active" href="../profile/">
+          👤 Profil <span class="nav-dot" style="background:var(--neon-orange)"></span>
+        </a>
+        <span class="nav-link" style="cursor:default">🏆 Tippspiel <span class="nav-link-soon">Soon</span></span>
+        <span class="nav-link" style="cursor:default">🎮 Highscores <span class="nav-link-soon">Soon</span></span>
+      </div>
     </div>
-    <div class="avatar-info">
-      <h2 id="displayNameHeader">Dein Profil</h2>
-      <p id="emailDisplay"></p>
-      <p style="font-size:0.78rem;color:#333;margin-top:0.3rem;">Klick auf den Avatar um ihn zu ändern</p>
+    <div class="navbar-right">
+      <a class="nav-avatar" id="navAvatar" href="../profile/" title="Profil">🎮</a>
+      <button class="btn-logout" onclick="logout()">Abmelden</button>
     </div>
-  </div>
+  </nav>
 
-  <!-- Emoji Picker -->
-  <div class="emoji-picker" id="emojiPicker">
-    <!-- wird per JS befüllt -->
-  </div>
+  <div class="page">
 
-  <div id="alertBox" class="alert"></div>
-
-  <!-- Anzeigename -->
-  <div class="card">
-    <div class="card-title">👤 Anzeigename</div>
-    <div class="form-group">
-      <input type="text" id="fUsername" placeholder="Wie sollen dich andere nennen?" maxlength="30">
+    <div class="avatar-section">
+      <div class="avatar-display" id="avatarDisplay" onclick="toggleEmojiPicker()">
+        <span id="avatarEmoji">🎮</span>
+        <div class="avatar-edit-hint">✏️</div>
+      </div>
+      <div class="avatar-info">
+        <h2 id="displayNameHeader">Dein Profil</h2>
+        <p id="emailDisplay"></p>
+        <p style="font-size:0.78rem;color:#333;margin-top:0.3rem;">Klick auf den Avatar zum Ändern</p>
+      </div>
     </div>
+
+    <div class="emoji-picker" id="emojiPicker"></div>
+
+    <div id="alertBox" class="alert"></div>
+
+    <div class="card">
+      <div class="card-title">👤 Anzeigename</div>
+      <div class="form-group">
+        <input type="text" id="fUsername" placeholder="Wie sollen dich andere nennen?" maxlength="30">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚡ Siegessprüche</div>
+      <div class="spruch-row"><div class="spruch-num">1</div><input type="text" id="s1" placeholder="z. B. Zu langsam, Brudi!" maxlength="80"></div>
+      <div class="spruch-row"><div class="spruch-num">2</div><input type="text" id="s2" placeholder="z. B. Kein Mercy!" maxlength="80"></div>
+      <div class="spruch-row"><div class="spruch-num">3</div><input type="text" id="s3" placeholder="z. B. Gg ez" maxlength="80"></div>
+      <div class="spruch-row"><div class="spruch-num">4</div><input type="text" id="s4" placeholder="z. B. Next!" maxlength="80"></div>
+      <div class="spruch-row"><div class="spruch-num">5</div><input type="text" id="s5" placeholder="z. B. War nix heute!" maxlength="80"></div>
+    </div>
+
+    <button class="btn-save" id="btnSave" onclick="saveProfile()">Profil speichern →</button>
+
   </div>
-
-  <!-- Siegessprüche -->
-  <div class="card">
-    <div class="card-title">⚡ Siegessprüche</div>
-    <div class="spruch-row"><div class="spruch-num">1</div><input type="text" id="s1" placeholder="z. B. Zu langsam, Brudi!" maxlength="80"></div>
-    <div class="spruch-row"><div class="spruch-num">2</div><input type="text" id="s2" placeholder="z. B. Kein Mercy!" maxlength="80"></div>
-    <div class="spruch-row"><div class="spruch-num">3</div><input type="text" id="s3" placeholder="z. B. Gg ez" maxlength="80"></div>
-    <div class="spruch-row"><div class="spruch-num">4</div><input type="text" id="s4" placeholder="z. B. Next!" maxlength="80"></div>
-    <div class="spruch-row"><div class="spruch-num">5</div><input type="text" id="s5" placeholder="z. B. War nix heute!" maxlength="80"></div>
-  </div>
-
-  <button class="btn-save" id="btnSave" onclick="saveProfile()">Profil speichern →</button>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 'use strict';
-
 const SUPABASE_URL = 'https://tovruvmgqfsesyvlrxjr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const EMOJIS = [
-  '🎮','👾','🕹️','🏆','🔥','⚡','💀','👑','🦁','🐺',
-  '🦊','🐉','🦅','🤖','👻','💥','🎯','🚀','🌪️','❄️',
-  '🌊','☄️','🎲','🃏','🥷','🦸','🤠','😈','🤡','👽'
-];
+const EMOJIS = ['🎮','👾','🕹️','🏆','🔥','⚡','💀','👑','🦁','🐺','🦊','🐉','🦅','🤖','👻','💥','🎯','🚀','🌪️','❄️','🌊','☄️','🎲','🃏','🥷','🦸','🤠','😈','🤡','👽'];
 
 let currentUser = null;
 let selectedEmoji = '🎮';
 
-// ── Init ─────────────────────────────────────────────────────────────────
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
-  if (!session) {
-    window.location.href = '../login/';
-    return;
-  }
-
+  if (!session) { window.location.href = '../login/'; return; }
   currentUser = session.user;
   document.getElementById('emailDisplay').textContent = currentUser.email;
   buildEmojiPicker();
@@ -417,7 +279,6 @@ async function init() {
   document.getElementById('mainPage').style.display = '';
 }
 
-// ── Emoji Picker ──────────────────────────────────────────────────────────
 function buildEmojiPicker() {
   const picker = document.getElementById('emojiPicker');
   EMOJIS.forEach(e => {
@@ -436,20 +297,13 @@ function toggleEmojiPicker() {
 function selectEmoji(emoji) {
   selectedEmoji = emoji;
   document.getElementById('avatarEmoji').textContent = emoji;
-  document.querySelectorAll('.emoji-option').forEach(el => {
-    el.classList.toggle('selected', el.textContent === emoji);
-  });
+  document.getElementById('navAvatar').textContent = emoji;
+  document.querySelectorAll('.emoji-option').forEach(el => el.classList.toggle('selected', el.textContent === emoji));
   document.getElementById('emojiPicker').classList.remove('open');
 }
 
-// ── Load Profile ──────────────────────────────────────────────────────────
 async function loadProfile() {
-  const { data } = await sb
-    .from('profiles')
-    .select('*')
-    .eq('id', currentUser.id)
-    .single();
-
+  const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
   if (data) {
     document.getElementById('fUsername').value = data.username || '';
     document.getElementById('s1').value = data.siegesspruch_1 || '';
@@ -466,45 +320,32 @@ function updateHeader(name) {
   document.getElementById('displayNameHeader').textContent = name || 'Dein Profil';
 }
 
-// ── Save Profile ──────────────────────────────────────────────────────────
 async function saveProfile() {
   const username = document.getElementById('fUsername').value.trim();
   if (!username) { showAlert('Bitte gib einen Anzeigenamen ein.', 'error'); return; }
-
   const payload = {
-    id: currentUser.id,
-    username,
-    avatar: selectedEmoji,
+    id: currentUser.id, username, avatar: selectedEmoji,
     siegesspruch_1: document.getElementById('s1').value.trim() || null,
     siegesspruch_2: document.getElementById('s2').value.trim() || null,
     siegesspruch_3: document.getElementById('s3').value.trim() || null,
     siegesspruch_4: document.getElementById('s4').value.trim() || null,
     siegesspruch_5: document.getElementById('s5').value.trim() || null,
   };
-
   setBtnLoading(true);
   const { error } = await sb.from('profiles').upsert(payload);
   setBtnLoading(false);
-
-  if (error) {
-    showAlert('Fehler beim Speichern: ' + error.message, 'error');
-  } else {
-    showAlert('✓ Profil gespeichert!', 'success');
-    updateHeader(username);
-  }
+  if (error) showAlert('Fehler: ' + error.message, 'error');
+  else { showAlert('✓ Profil gespeichert!', 'success'); updateHeader(username); }
 }
 
-// ── Logout ────────────────────────────────────────────────────────────────
 async function logout() {
   await sb.auth.signOut();
   window.location.href = '../login/';
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
 function showAlert(msg, type) {
   const el = document.getElementById('alertBox');
-  el.textContent = msg;
-  el.className = 'alert ' + type;
+  el.textContent = msg; el.className = 'alert ' + type;
   setTimeout(() => { el.className = 'alert'; }, 4000);
 }
 

@@ -33,84 +33,113 @@
   }
 
   .blob {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    pointer-events: none;
-    opacity: 0.45;
-    z-index: 0;
+    position: fixed; border-radius: 50%; filter: blur(80px);
+    pointer-events: none; opacity: 0.45; z-index: 0;
   }
   .blob-1 { width: 500px; height: 500px; top: -15%; left: -10%; background: var(--neon-blue);    animation: drift1 9s ease-in-out infinite alternate; }
   .blob-2 { width: 350px; height: 350px; bottom: -5%; right: -5%; background: var(--neon-orange); animation: drift2 11s ease-in-out infinite alternate; }
   .blob-3 { width: 250px; height: 250px; top: 40%; left: 55%; background: var(--neon-green);    animation: drift1 7s ease-in-out infinite alternate-reverse; }
-
   @keyframes drift1 { from { transform: translate(0,0); } to { transform: translate(30px,40px); } }
   @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-40px,-30px); } }
 
   .grid {
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 36px 36px;
-    pointer-events: none;
-    z-index: 0;
+    position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 36px 36px; pointer-events: none; z-index: 0;
   }
 
-  /* Layout */
-  .page {
-    position: relative;
-    z-index: 10;
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-  }
-
-  /* Navbar */
+  /* ── Navbar ── */
   .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(5,5,8,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    height: 58px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 3rem;
+    gap: 1rem;
   }
 
+  .navbar-left { display: flex; align-items: center; gap: 2rem; }
+
   .logo {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 800;
     letter-spacing: -0.03em;
+    text-decoration: none;
+    color: var(--text);
+    flex-shrink: 0;
   }
   .logo span {
     color: var(--neon-yellow);
     text-shadow: 0 0 10px rgba(245,255,0,0.5);
   }
 
-  .nav-right { display: flex; align-items: center; gap: 0.8rem; }
+  .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  .nav-link.active { color: var(--text); background: rgba(255,255,255,0.07); }
+  .nav-link.active .nav-dot { opacity: 1; }
+
+  .nav-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .nav-link-soon {
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #333;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid #1a1a1a;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+  }
+
+  .navbar-right { display: flex; align-items: center; gap: 0.75rem; }
 
   .nav-avatar {
-    width: 36px;
-    height: 36px;
+    width: 32px; height: 32px;
     background: var(--bg);
     border: 1.5px solid var(--neon-orange);
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 0 10px rgba(255,106,0,0.3);
+    box-shadow: 0 0 10px rgba(255,106,0,0.25);
     text-decoration: none;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
   }
-  .nav-avatar:hover { transform: scale(1.1); }
+  .nav-avatar:hover { transform: scale(1.1); box-shadow: 0 0 16px rgba(255,106,0,0.4); }
 
   .btn-logout {
     background: transparent;
-    border: 1px solid #222;
+    border: 1px solid #1e1e1e;
     color: var(--muted);
-    padding: 0.4rem 0.9rem;
-    border-radius: 8px;
-    font-size: 0.82rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 7px;
+    font-size: 0.8rem;
     font-weight: 600;
     font-family: inherit;
     cursor: pointer;
@@ -118,141 +147,73 @@
   }
   .btn-logout:hover { border-color: var(--neon-red); color: var(--neon-red); }
 
-  /* Hero */
-  .hero {
-    margin-bottom: 3rem;
-    animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  /* ── Page ── */
+  .page {
+    position: relative; z-index: 10;
+    max-width: 680px; margin: 0 auto;
+    padding: 2.5rem 1rem;
   }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: none; }
-  }
+  .hero { margin-bottom: 3rem; animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
 
   .hero-greeting {
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--neon-green);
-    text-shadow: 0 0 10px rgba(0,255,136,0.4);
-    margin-bottom: 0.6rem;
+    font-size: 0.82rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--neon-green);
+    text-shadow: 0 0 10px rgba(0,255,136,0.4); margin-bottom: 0.6rem;
   }
 
   .hero h1 {
-    font-size: clamp(2rem, 6vw, 3rem);
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
-    margin-bottom: 0.8rem;
+    font-size: clamp(2rem, 6vw, 3rem); font-weight: 800;
+    letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 0.8rem;
   }
+  .hero h1 .name { color: var(--neon-yellow); text-shadow: 0 0 20px rgba(245,255,0,0.4); }
+  .hero p { font-size: 1rem; color: var(--muted); line-height: 1.6; max-width: 480px; }
 
-  .hero h1 .name {
-    color: var(--neon-yellow);
-    text-shadow: 0 0 20px rgba(245,255,0,0.4);
-  }
-
-  .hero p {
-    font-size: 1rem;
-    color: var(--muted);
-    line-height: 1.6;
-    max-width: 480px;
-  }
-
-  /* Grid Cards */
   .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-    animation: fadeUp 0.5s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem; animation: fadeUp 0.5s 0.1s cubic-bezier(0.16,1,0.3,1) both;
   }
 
   .nav-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.5rem;
-    text-decoration: none;
-    color: var(--text);
-    transition: all 0.25s;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.5rem;
+    text-decoration: none; color: var(--text);
+    transition: all 0.25s; cursor: pointer;
+    position: relative; overflow: hidden;
+    display: block;
   }
-
-  .nav-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.25s;
-    border-radius: 16px;
-  }
-
+  .nav-card::before { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.25s; border-radius: 16px; }
   .nav-card:hover { transform: translateY(-3px); }
   .nav-card:hover::before { opacity: 1; }
-
   .nav-card.yellow::before { background: rgba(245,255,0,0.04); }
   .nav-card.blue::before   { background: rgba(0,212,255,0.04); }
   .nav-card.green::before  { background: rgba(0,255,136,0.04); }
   .nav-card.orange::before { background: rgba(255,106,0,0.04); }
+  .nav-card.yellow:hover { border-color: rgba(245,255,0,0.3); box-shadow: 0 8px 30px rgba(245,255,0,0.08); }
+  .nav-card.blue:hover   { border-color: rgba(0,212,255,0.3); box-shadow: 0 8px 30px rgba(0,212,255,0.08); }
+  .nav-card.green:hover  { border-color: rgba(0,255,136,0.3); box-shadow: 0 8px 30px rgba(0,255,136,0.08); }
+  .nav-card.orange:hover { border-color: rgba(255,106,0,0.3); box-shadow: 0 8px 30px rgba(255,106,0,0.08); }
 
-  .nav-card.yellow:hover { border-color: rgba(245,255,0,0.3);  box-shadow: 0 8px 30px rgba(245,255,0,0.08); }
-  .nav-card.blue:hover   { border-color: rgba(0,212,255,0.3);  box-shadow: 0 8px 30px rgba(0,212,255,0.08); }
-  .nav-card.green:hover  { border-color: rgba(0,255,136,0.3);  box-shadow: 0 8px 30px rgba(0,255,136,0.08); }
-  .nav-card.orange:hover { border-color: rgba(255,106,0,0.3);  box-shadow: 0 8px 30px rgba(255,106,0,0.08); }
-
-  .card-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    display: block;
-  }
-
-  .card-label {
-    font-size: 0.72rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.3rem;
-  }
-
+  .card-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
+  .card-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
   .card-label.yellow { color: var(--neon-yellow); text-shadow: 0 0 8px rgba(245,255,0,0.4); }
   .card-label.blue   { color: var(--neon-blue);   text-shadow: 0 0 8px rgba(0,212,255,0.4); }
   .card-label.green  { color: var(--neon-green);  text-shadow: 0 0 8px rgba(0,255,136,0.4); }
   .card-label.orange { color: var(--neon-orange); text-shadow: 0 0 8px rgba(255,106,0,0.4); }
-
-  .card-desc {
-    font-size: 0.82rem;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
+  .card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
   .card-soon {
-    position: absolute;
-    top: 0.8rem;
-    right: 0.8rem;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--border);
-    color: #333;
-    font-size: 0.62rem;
-    font-weight: 800;
-    padding: 0.15rem 0.45rem;
-    border-radius: 999px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    position: absolute; top: 0.8rem; right: 0.8rem;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    color: #333; font-size: 0.62rem; font-weight: 800;
+    padding: 0.15rem 0.45rem; border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 0.06em;
   }
 
-  /* Loading */
   #loadingScreen {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    font-size: 2rem;
-    animation: pulse 1s ease-in-out infinite;
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; font-size: 2rem; animation: pulse 1s ease-in-out infinite;
   }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 </style>
@@ -266,48 +227,57 @@
 
 <div id="loadingScreen">⚡</div>
 
-<div class="page" id="mainPage" style="display:none">
+<div id="mainPage" style="display:none">
 
   <nav class="navbar">
-    <div class="logo">Klaus<span>Maniac</span></div>
-    <div class="nav-right">
+    <div class="navbar-left">
+      <a class="logo" href="../dashboard/">Klaus<span>Maniac</span></a>
+      <div class="nav-links">
+        <a class="nav-link active" href="../dashboard/">
+          🏠 Home <span class="nav-dot" style="background:var(--neon-yellow)"></span>
+        </a>
+        <a class="nav-link" href="../profile/">👤 Profil</a>
+        <span class="nav-link" style="cursor:default">🏆 Tippspiel <span class="nav-link-soon">Soon</span></span>
+        <span class="nav-link" style="cursor:default">🎮 Highscores <span class="nav-link-soon">Soon</span></span>
+      </div>
+    </div>
+    <div class="navbar-right">
       <a class="nav-avatar" id="navAvatar" href="../profile/" title="Profil">🎮</a>
       <button class="btn-logout" onclick="logout()">Abmelden</button>
     </div>
   </nav>
 
-  <div class="hero">
-    <div class="hero-greeting">Willkommen zurück</div>
-    <h1>Was geht,<br><span class="name" id="heroName">Brudi</span>! 🤙</h1>
-    <p>Dein Space für Tipps, Rekorde und Chaos mit Freunden.</p>
-  </div>
-
-  <div class="cards-grid">
-    <a class="nav-card yellow" href="../profile/">
-      <span class="card-icon">👤</span>
-      <div class="card-label yellow">Profil</div>
-      <div class="card-desc">Anzeigename, Avatar & Siegessprüche verwalten</div>
-    </a>
-
-    <div class="nav-card blue">
-      <span class="card-icon">🏆</span>
-      <div class="card-label blue">Tippspiel</div>
-      <div class="card-desc">Tippe Ergebnisse und messe dich mit Freunden</div>
-      <div class="card-soon">Soon</div>
+  <div class="page">
+    <div class="hero">
+      <div class="hero-greeting">Willkommen zurück</div>
+      <h1>Was geht,<br><span class="name" id="heroName">Brudi</span>! 🤙</h1>
+      <p>Dein Space für Tipps, Rekorde und Chaos mit Freunden.</p>
     </div>
 
-    <div class="nav-card green">
-      <span class="card-icon">🎮</span>
-      <div class="card-label green">Highscores</div>
-      <div class="card-desc">Rekorde speichern und Ranglisten einsehen</div>
-      <div class="card-soon">Soon</div>
-    </div>
-
-    <div class="nav-card orange">
-      <span class="card-icon">👥</span>
-      <div class="card-label orange">Freunde</div>
-      <div class="card-desc">Freunde einladen und gemeinsam spielen</div>
-      <div class="card-soon">Soon</div>
+    <div class="cards-grid">
+      <a class="nav-card yellow" href="../profile/">
+        <span class="card-icon">👤</span>
+        <div class="card-label yellow">Profil</div>
+        <div class="card-desc">Anzeigename, Avatar & Siegessprüche verwalten</div>
+      </a>
+      <div class="nav-card blue">
+        <span class="card-icon">🏆</span>
+        <div class="card-label blue">Tippspiel</div>
+        <div class="card-desc">Tippe Ergebnisse und messe dich mit Freunden</div>
+        <div class="card-soon">Soon</div>
+      </div>
+      <div class="nav-card green">
+        <span class="card-icon">🎮</span>
+        <div class="card-label green">Highscores</div>
+        <div class="card-desc">Rekorde speichern und Ranglisten einsehen</div>
+        <div class="card-soon">Soon</div>
+      </div>
+      <div class="nav-card orange">
+        <span class="card-icon">👥</span>
+        <div class="card-label orange">Freunde</div>
+        <div class="card-desc">Freunde einladen und gemeinsam spielen</div>
+        <div class="card-soon">Soon</div>
+      </div>
     </div>
   </div>
 
@@ -316,7 +286,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 'use strict';
-
 const SUPABASE_URL = 'https://tovruvmgqfsesyvlrxjr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -324,18 +293,11 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = '../login/'; return; }
-
-  const { data: profile } = await sb
-    .from('profiles')
-    .select('username, avatar')
-    .eq('id', session.user.id)
-    .single();
-
+  const { data: profile } = await sb.from('profiles').select('username, avatar').eq('id', session.user.id).single();
   if (profile) {
     if (profile.username) document.getElementById('heroName').textContent = profile.username;
     if (profile.avatar)   document.getElementById('navAvatar').textContent = profile.avatar;
   }
-
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('mainPage').style.display = '';
 }

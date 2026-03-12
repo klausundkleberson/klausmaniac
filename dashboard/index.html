@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home – KlausManiac</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050508;
+    --neon-yellow: #f5ff00;
+    --neon-blue:   #00d4ff;
+    --neon-orange: #ff6a00;
+    --neon-green:  #00ff88;
+    --neon-red:    #ff003c;
+    --card: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f0f0;
+    --muted: #555;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    opacity: 0.45;
+    z-index: 0;
+  }
+  .blob-1 { width: 500px; height: 500px; top: -15%; left: -10%; background: var(--neon-blue);    animation: drift1 9s ease-in-out infinite alternate; }
+  .blob-2 { width: 350px; height: 350px; bottom: -5%; right: -5%; background: var(--neon-orange); animation: drift2 11s ease-in-out infinite alternate; }
+  .blob-3 { width: 250px; height: 250px; top: 40%; left: 55%; background: var(--neon-green);    animation: drift1 7s ease-in-out infinite alternate-reverse; }
+
+  @keyframes drift1 { from { transform: translate(0,0); } to { transform: translate(30px,40px); } }
+  @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-40px,-30px); } }
+
+  .grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 36px 36px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Layout */
+  .page {
+    position: relative;
+    z-index: 10;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  /* Navbar */
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .logo span {
+    color: var(--neon-yellow);
+    text-shadow: 0 0 10px rgba(245,255,0,0.5);
+  }
+
+  .nav-right { display: flex; align-items: center; gap: 0.8rem; }
+
+  .nav-avatar {
+    width: 36px;
+    height: 36px;
+    background: var(--bg);
+    border: 1.5px solid var(--neon-orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255,106,0,0.3);
+    text-decoration: none;
+    transition: transform 0.2s;
+  }
+  .nav-avatar:hover { transform: scale(1.1); }
+
+  .btn-logout {
+    background: transparent;
+    border: 1px solid #222;
+    color: var(--muted);
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover { border-color: var(--neon-red); color: var(--neon-red); }
+
+  /* Hero */
+  .hero {
+    margin-bottom: 3rem;
+    animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .hero-greeting {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px rgba(0,255,136,0.4);
+    margin-bottom: 0.6rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 0.8rem;
+  }
+
+  .hero h1 .name {
+    color: var(--neon-yellow);
+    text-shadow: 0 0 20px rgba(245,255,0,0.4);
+  }
+
+  .hero p {
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 480px;
+  }
+
+  /* Grid Cards */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    animation: fadeUp 0.5s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  .nav-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.25s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .nav-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+    border-radius: 16px;
+  }
+
+  .nav-card:hover { transform: translateY(-3px); }
+  .nav-card:hover::before { opacity: 1; }
+
+  .nav-card.yellow::before { background: rgba(245,255,0,0.04); }
+  .nav-card.blue::before   { background: rgba(0,212,255,0.04); }
+  .nav-card.green::before  { background: rgba(0,255,136,0.04); }
+  .nav-card.orange::before { background: rgba(255,106,0,0.04); }
+
+  .nav-card.yellow:hover { border-color: rgba(245,255,0,0.3);  box-shadow: 0 8px 30px rgba(245,255,0,0.08); }
+  .nav-card.blue:hover   { border-color: rgba(0,212,255,0.3);  box-shadow: 0 8px 30px rgba(0,212,255,0.08); }
+  .nav-card.green:hover  { border-color: rgba(0,255,136,0.3);  box-shadow: 0 8px 30px rgba(0,255,136,0.08); }
+  .nav-card.orange:hover { border-color: rgba(255,106,0,0.3);  box-shadow: 0 8px 30px rgba(255,106,0,0.08); }
+
+  .card-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .card-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.3rem;
+  }
+
+  .card-label.yellow { color: var(--neon-yellow); text-shadow: 0 0 8px rgba(245,255,0,0.4); }
+  .card-label.blue   { color: var(--neon-blue);   text-shadow: 0 0 8px rgba(0,212,255,0.4); }
+  .card-label.green  { color: var(--neon-green);  text-shadow: 0 0 8px rgba(0,255,136,0.4); }
+  .card-label.orange { color: var(--neon-orange); text-shadow: 0 0 8px rgba(255,106,0,0.4); }
+
+  .card-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .card-soon {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: #333;
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Loading */
+  #loadingScreen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    font-size: 2rem;
+    animation: pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<div class="grid"></div>
+
+<div id="loadingScreen">⚡</div>
+
+<div class="page" id="mainPage" style="display:none">
+
+  <nav class="navbar">
+    <div class="logo">Klaus<span>Maniac</span></div>
+    <div class="nav-right">
+      <a class="nav-avatar" id="navAvatar" href="../profile/" title="Profil">🎮</a>
+      <button class="btn-logout" onclick="logout()">Abmelden</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-greeting">Willkommen zurück</div>
+    <h1>Was geht,<br><span class="name" id="heroName">Brudi</span>! 🤙</h1>
+    <p>Dein Space für Tipps, Rekorde und Chaos mit Freunden.</p>
+  </div>
+
+  <div class="cards-grid">
+    <a class="nav-card yellow" href="../profile/">
+      <span class="card-icon">👤</span>
+      <div class="card-label yellow">Profil</div>
+      <div class="card-desc">Anzeigename, Avatar & Siegessprüche verwalten</div>
+    </a>
+
+    <div class="nav-card blue">
+      <span class="card-icon">🏆</span>
+      <div class="card-label blue">Tippspiel</div>
+      <div class="card-desc">Tippe Ergebnisse und messe dich mit Freunden</div>
+      <div class="card-soon">Soon</div>
+    </div>
+
+    <div class="nav-card green">
+      <span class="card-icon">🎮</span>
+      <div class="card-label green">Highscores</div>
+      <div class="card-desc">Rekorde speichern und Ranglisten einsehen</div>
+      <div class="card-soon">Soon</div>
+    </div>
+
+    <div class="nav-card orange">
+      <span class="card-icon">👥</span>
+      <div class="card-label orange">Freunde</div>
+      <div class="card-desc">Freunde einladen und gemeinsam spielen</div>
+      <div class="card-soon">Soon</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+
+const SUPABASE_URL = 'https://tovruvmgqfsesyvlrxjr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = '../login/'; return; }
+
+  const { data: profile } = await sb
+    .from('profiles')
+    .select('username, avatar')
+    .eq('id', session.user.id)
+    .single();
+
+  if (profile) {
+    if (profile.username) document.getElementById('heroName').textContent = profile.username;
+    if (profile.avatar)   document.getElementById('navAvatar').textContent = profile.avatar;
+  }
+
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('mainPage').style.display = '';
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = '../login/';
+}
+
+init();
+</script>
+</body>
+</html>

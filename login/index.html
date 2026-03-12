@@ -532,9 +532,10 @@ async function register() {
 }
 
 async function loginWithGoogle() {
+  const base = window.location.origin + window.location.pathname.replace('login/', '');
   await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.href }
+    options: { redirectTo: base + 'dashboard/' }
   });
 }
 
@@ -543,7 +544,7 @@ async function logout() {
 }
 
 function showDashboard(user) {
-  window.location.href = '../profile/';
+  window.location.href = '../dashboard/';
 }
 
 function showAuth() {

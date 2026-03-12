@@ -338,7 +338,7 @@
 <div class="page" id="mainPage" style="display:none">
 
   <div class="top-bar">
-    <div class="logo">Klaus<span>Maniac</span></div>
+    <div class="logo" style="cursor:pointer" onclick="window.location.href='../dashboard/'">Klaus<span>Maniac</span></div>
     <button class="btn-logout" onclick="logout()">Abmelden</button>
   </div>
 
@@ -408,6 +408,7 @@ async function init() {
     window.location.href = '../login/';
     return;
   }
+
   currentUser = session.user;
   document.getElementById('emailDisplay').textContent = currentUser.email;
   buildEmojiPicker();

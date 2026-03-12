@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wette erstellen – KlausManiac</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050508;
+    --neon-yellow: #f5ff00;
+    --neon-blue:   #00d4ff;
+    --neon-orange: #ff6a00;
+    --neon-green:  #00ff88;
+    --neon-red:    #ff003c;
+    --card: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f0f0;
+    --muted: #555;
+    --input-bg: rgba(255,255,255,0.04);
+  }
+
+  body { font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); position: relative; overflow-x: hidden; }
+
+  .blob { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.45; z-index: 0; }
+  .blob-1 { width: 500px; height: 500px; top: -15%; left: -10%; background: var(--neon-blue); animation: drift1 9s ease-in-out infinite alternate; }
+  .blob-2 { width: 350px; height: 350px; bottom: -5%; right: -5%; background: var(--neon-orange); animation: drift2 11s ease-in-out infinite alternate; }
+  @keyframes drift1 { from { transform: translate(0,0); } to { transform: translate(30px,40px); } }
+  @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-40px,-30px); } }
+
+  .grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 36px 36px; pointer-events: none; z-index: 0; }
+
+  /* Navbar */
+  .navbar { position: sticky; top: 0; z-index: 50; background: rgba(5,5,8,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .navbar-left { display: flex; align-items: center; gap: 2rem; }
+  .logo { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.03em; text-decoration: none; color: var(--text); flex-shrink: 0; }
+  .logo span { color: var(--neon-yellow); text-shadow: 0 0 10px rgba(245,255,0,0.5); }
+  .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+  .nav-link { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--muted); text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+  .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  .nav-link.active { color: var(--text); background: rgba(255,255,255,0.07); }
+  .nav-link.active .nav-dot { opacity: 1; }
+  .nav-dot { width: 5px; height: 5px; border-radius: 50%; opacity: 0; transition: opacity 0.2s; }
+  .navbar-right { display: flex; align-items: center; gap: 0.75rem; }
+  .nav-avatar { width: 32px; height: 32px; background: var(--bg); border: 1.5px solid var(--neon-orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; box-shadow: 0 0 10px rgba(255,106,0,0.25); text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; }
+  .nav-avatar:hover { transform: scale(1.1); box-shadow: 0 0 16px rgba(255,106,0,0.4); }
+  .btn-logout { background: transparent; border: 1px solid #1e1e1e; color: var(--muted); padding: 0.35rem 0.8rem; border-radius: 7px; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+  .btn-logout:hover { border-color: var(--neon-red); color: var(--neon-red); }
+
+  /* Page */
+  .page { position: relative; z-index: 10; max-width: 600px; margin: 0 auto; padding: 2.5rem 1rem; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+  .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 600; margin-bottom: 1.5rem; transition: color 0.2s; }
+  .back-link:hover { color: var(--text); }
+
+  .page-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
+  .page-subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+  .card-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-group:last-child { margin-bottom: 0; }
+  label { display: block; font-size: 0.75rem; font-weight: 700; color: #444; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.4rem; }
+
+  input[type="text"], input[type="datetime-local"], textarea {
+    width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+    border-radius: 9px; padding: 0.7rem 0.9rem; color: var(--text);
+    font-size: 0.95rem; font-family: inherit; transition: all 0.2s;
+    color-scheme: dark;
+  }
+  input::placeholder, textarea::placeholder { color: #2a2a2a; }
+  input:focus, textarea:focus { outline: none; border-color: var(--neon-blue); background: rgba(0,212,255,0.05); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .sides-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+  .side-input-wrap { position: relative; }
+  .side-label-tag {
+    position: absolute; right: 0.7rem; top: 50%; transform: translateY(-50%);
+    font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 0.15rem 0.4rem; border-radius: 4px; pointer-events: none;
+  }
+  .side-a-tag { background: rgba(0,212,255,0.15); color: var(--neon-blue); border: 1px solid rgba(0,212,255,0.3); }
+  .side-b-tag { background: rgba(255,106,0,0.15); color: var(--neon-orange); border: 1px solid rgba(255,106,0,0.3); }
+  .side-input-wrap input { padding-right: 4.5rem; }
+
+  /* Side selector */
+  .side-selector { display: flex; gap: 0.7rem; }
+  .side-btn {
+    flex: 1; padding: 0.8rem; border-radius: 12px; border: 2px solid transparent;
+    background: rgba(255,255,255,0.03); color: var(--muted); font-family: inherit;
+    font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .side-btn-a.selected { background: rgba(0,212,255,0.1); border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 14px rgba(0,212,255,0.2); }
+  .side-btn-b.selected { background: rgba(255,106,0,0.1); border-color: var(--neon-orange); color: var(--neon-orange); box-shadow: 0 0 14px rgba(255,106,0,0.2); }
+  .side-btn:hover { background: rgba(255,255,255,0.05); }
+
+  .kloins-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+  .alert { display: none; padding: 0.7rem 0.9rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; }
+  .alert.error   { display: block; background: rgba(255,0,60,0.1); border: 1px solid rgba(255,0,60,0.3); color: #ff6b8a; }
+  .alert.success { display: block; background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25); color: var(--neon-green); }
+
+  .btn-save { width: 100%; padding: 0.9rem; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 800; cursor: pointer; font-family: inherit; letter-spacing: 0.02em; text-transform: uppercase; background: var(--neon-yellow); color: #000; box-shadow: 0 0 20px rgba(245,255,0,0.3); transition: all 0.2s; margin-top: 0.5rem; }
+  .btn-save:hover:not(:disabled) { box-shadow: 0 0 32px rgba(245,255,0,0.55); transform: translateY(-1px); }
+  .btn-save:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .kloins-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; }
+  .kloins-hint .kloins-val { color: var(--neon-yellow); font-weight: 800; }
+
+  /* Bottom Nav */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: rgba(5,5,8,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom)); display: none; grid-template-columns: repeat(4, 1fr); }
+  .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 0.4rem; text-decoration: none; color: var(--muted); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.2s; }
+  .bottom-nav-item .bn-icon { font-size: 1.3rem; }
+  .bottom-nav-item.active { color: var(--neon-yellow); }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .bottom-nav { display: grid; }
+    .page { padding-bottom: 5rem; }
+    .sides-grid, .kloins-row { grid-template-columns: 1fr; }
+  }
+
+  #loadingScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; font-size: 2rem; animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="grid"></div>
+
+<div id="loadingScreen">⚡</div>
+
+<div id="mainPage" style="display:none">
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a class="logo" href="../../dashboard/">Klaus<span>Maniac</span></a>
+      <div class="nav-links">
+        <a class="nav-link" href="../../dashboard/">🏠 Home</a>
+        <a class="nav-link" href="../../profile/">👤 Profil</a>
+        <a class="nav-link active" href="../../bets/">
+          🏆 Tippspiel <span class="nav-dot" style="background:var(--neon-blue)"></span>
+        </a>
+        <a class="nav-link" href="../../highscores/">🎮 Highscores</a>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <a class="nav-avatar" id="navAvatar" href="../../profile/" title="Profil">🎮</a>
+      <button class="btn-logout" onclick="logout()">Abmelden</button>
+    </div>
+  </nav>
+
+  <div class="page">
+    <a class="back-link" href="../">← Zurück zu Wetten</a>
+
+    <div class="page-title">Neue Wette 🏆</div>
+    <div class="page-subtitle">Erstelle eine Wette und wähle direkt deine Seite.</div>
+
+    <div id="alertBox" class="alert"></div>
+
+    <div class="card" style="animation-delay:0s">
+      <div class="card-title">📋 Wette</div>
+      <div class="form-group">
+        <label>Titel *</label>
+        <input type="text" id="fTitle" placeholder="Wer gewinnt das Spiel?" maxlength="100">
+      </div>
+      <div class="form-group">
+        <label>Beschreibung</label>
+        <textarea id="fDesc" placeholder="Optionale Details zur Wette…" maxlength="500"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Enddatum &amp; Uhrzeit *</label>
+        <input type="datetime-local" id="fEndsAt">
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay:0.05s">
+      <div class="card-title">⚔️ Seiten</div>
+      <div class="sides-grid">
+        <div class="form-group" style="margin:0">
+          <label>Seite A (blau)</label>
+          <div class="side-input-wrap">
+            <input type="text" id="fSideA" placeholder="Team A" maxlength="40" value="Team A">
+            <span class="side-label-tag side-a-tag">A</span>
+          </div>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Seite B (orange)</label>
+          <div class="side-input-wrap">
+            <input type="text" id="fSideB" placeholder="Team B" maxlength="40" value="Team B">
+            <span class="side-label-tag side-b-tag">B</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay:0.1s">
+      <div class="card-title">🎯 Dein Einsatz</div>
+      <div class="form-group">
+        <label>Deine Seite *</label>
+        <div class="side-selector">
+          <button class="side-btn side-btn-a" id="btnA" onclick="selectSide('A')">
+            <span id="labelA">Team A</span>
+          </button>
+          <button class="side-btn side-btn-b" id="btnB" onclick="selectSide('B')">
+            <span id="labelB">Team B</span>
+          </button>
+        </div>
+      </div>
+      <div class="kloins-row">
+        <div class="form-group" style="margin:0">
+          <label>Einsatz (Kloins) *</label>
+          <input type="text" id="fAmount" placeholder="z. B. 100" maxlength="7" oninput="updateKloinsPreview()" value="100">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Einsatzbeschreibung</label>
+          <input type="text" id="fStakeDesc" placeholder="z. B. Ehrenwort!" maxlength="100">
+        </div>
+      </div>
+      <div class="kloins-hint">Dein Kontostand: <span class="kloins-val" id="kloinsBalance">…</span> Kloins</div>
+    </div>
+
+    <button class="btn-save" id="btnSave" onclick="createBet()">Wette erstellen →</button>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <a class="bottom-nav-item" href="../../dashboard/"><span class="bn-icon">🏠</span>Home</a>
+    <a class="bottom-nav-item" href="../../profile/"><span class="bn-icon">👤</span>Profil</a>
+    <a class="bottom-nav-item active" href="../../bets/"><span class="bn-icon">🏆</span>Tipps</a>
+    <a class="bottom-nav-item" href="../../highscores/"><span class="bn-icon">🎮</span>Scores</a>
+  </nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+const SUPABASE_URL = 'https://tovruvmgqfsesyvlrxjr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let selectedSide = null;
+let userKloins = 1000;
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = '../../login/'; return; }
+  currentUser = session.user;
+
+  const { data: profile } = await sb.from('profiles').select('avatar, kloins').eq('id', currentUser.id).single();
+  if (profile) {
+    if (profile.avatar) document.getElementById('navAvatar').textContent = profile.avatar;
+    userKloins = profile.kloins ?? 1000;
+    document.getElementById('kloinsBalance').textContent = userKloins.toLocaleString('de-DE');
+  }
+
+  // Default ends_at: now + 7 days
+  const d = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  d.setSeconds(0, 0);
+  document.getElementById('fEndsAt').value = d.toISOString().slice(0, 16);
+
+  // Sync side labels on input
+  document.getElementById('fSideA').addEventListener('input', () => {
+    document.getElementById('labelA').textContent = document.getElementById('fSideA').value || 'Team A';
+  });
+  document.getElementById('fSideB').addEventListener('input', () => {
+    document.getElementById('labelB').textContent = document.getElementById('fSideB').value || 'Team B';
+  });
+
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('mainPage').style.display = '';
+}
+
+function selectSide(side) {
+  selectedSide = side;
+  document.getElementById('btnA').classList.toggle('selected', side === 'A');
+  document.getElementById('btnB').classList.toggle('selected', side === 'B');
+}
+
+function updateKloinsPreview() {}
+
+async function createBet() {
+  const title = document.getElementById('fTitle').value.trim();
+  const desc  = document.getElementById('fDesc').value.trim();
+  const endsAt= document.getElementById('fEndsAt').value;
+  const sideA = document.getElementById('fSideA').value.trim() || 'Team A';
+  const sideB = document.getElementById('fSideB').value.trim() || 'Team B';
+  const amountRaw = parseInt(document.getElementById('fAmount').value.replace(/[^0-9]/g, ''), 10);
+  const stakeDesc = document.getElementById('fStakeDesc').value.trim();
+
+  if (!title)         return showAlert('Bitte einen Titel eingeben.', 'error');
+  if (!endsAt)        return showAlert('Bitte ein Enddatum wählen.', 'error');
+  if (new Date(endsAt) <= new Date()) return showAlert('Enddatum muss in der Zukunft liegen.', 'error');
+  if (!selectedSide)  return showAlert('Bitte deine Seite wählen.', 'error');
+  if (!amountRaw || amountRaw <= 0) return showAlert('Bitte einen gültigen Einsatz eingeben.', 'error');
+  if (amountRaw > userKloins) return showAlert(`Du hast nur ${userKloins.toLocaleString('de-DE')} Kloins.`, 'error');
+
+  setBtnLoading(true);
+
+  // Create bet
+  const { data: bet, error: betErr } = await sb.from('bets').insert({
+    title, description: desc || null,
+    created_by: currentUser.id,
+    side_a_label: sideA, side_b_label: sideB,
+    ends_at: new Date(endsAt).toISOString(),
+    status: 'open'
+  }).select().single();
+
+  if (betErr) { setBtnLoading(false); return showAlert('Fehler: ' + betErr.message, 'error'); }
+
+  // Join bet
+  const { error: partErr } = await sb.from('bet_participants').insert({
+    bet_id: bet.id,
+    user_id: currentUser.id,
+    side: selectedSide,
+    amount: amountRaw,
+    stake_description: stakeDesc || null
+  });
+
+  if (partErr) { setBtnLoading(false); return showAlert('Wette erstellt, aber Einsatz fehlgeschlagen: ' + partErr.message, 'error'); }
+
+  // Deduct kloins
+  await sb.from('profiles').update({ kloins: userKloins - amountRaw }).eq('id', currentUser.id);
+
+  setBtnLoading(false);
+  showAlert('✓ Wette erstellt!', 'success');
+  setTimeout(() => { window.location.href = '../detail/?id=' + bet.id; }, 900);
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = '../../login/';
+}
+
+function showAlert(msg, type) {
+  const el = document.getElementById('alertBox');
+  el.textContent = msg; el.className = 'alert ' + type;
+  if (type === 'error') setTimeout(() => { el.className = 'alert'; }, 4000);
+}
+
+function setBtnLoading(loading) {
+  const btn = document.getElementById('btnSave');
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Erstellt…' : 'Wette erstellen →';
+}
+
+init();
+</script>
+</body>
+</html>

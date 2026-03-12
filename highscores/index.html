@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Highscores – KlausManiac</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050508;
+    --neon-yellow: #f5ff00;
+    --neon-blue:   #00d4ff;
+    --neon-orange: #ff6a00;
+    --neon-green:  #00ff88;
+    --neon-red:    #ff003c;
+    --card: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f0f0;
+    --muted: #555;
+  }
+
+  body { font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); position: relative; overflow-x: hidden; }
+
+  .blob { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.45; z-index: 0; }
+  .blob-1 { width: 500px; height: 500px; top: -15%; left: -10%; background: var(--neon-green); animation: drift1 9s ease-in-out infinite alternate; }
+  .blob-2 { width: 350px; height: 350px; bottom: -5%; right: -5%; background: var(--neon-yellow); animation: drift2 11s ease-in-out infinite alternate; opacity: 0.3; }
+  @keyframes drift1 { from { transform: translate(0,0); } to { transform: translate(30px,40px); } }
+  @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-40px,-30px); } }
+
+  .grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 36px 36px; pointer-events: none; z-index: 0; }
+
+  /* Navbar */
+  .navbar { position: sticky; top: 0; z-index: 50; background: rgba(5,5,8,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .navbar-left { display: flex; align-items: center; gap: 2rem; }
+  .logo { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.03em; text-decoration: none; color: var(--text); flex-shrink: 0; }
+  .logo span { color: var(--neon-yellow); text-shadow: 0 0 10px rgba(245,255,0,0.5); }
+  .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+  .nav-link { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--muted); text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+  .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  .nav-link.active { color: var(--text); background: rgba(255,255,255,0.07); }
+  .nav-link.active .nav-dot { opacity: 1; }
+  .nav-dot { width: 5px; height: 5px; border-radius: 50%; opacity: 0; transition: opacity 0.2s; }
+  .navbar-right { display: flex; align-items: center; gap: 0.75rem; }
+  .nav-avatar { width: 32px; height: 32px; background: var(--bg); border: 1.5px solid var(--neon-orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; box-shadow: 0 0 10px rgba(255,106,0,0.25); text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; }
+  .nav-avatar:hover { transform: scale(1.1); box-shadow: 0 0 16px rgba(255,106,0,0.4); }
+  .btn-logout { background: transparent; border: 1px solid #1e1e1e; color: var(--muted); padding: 0.35rem 0.8rem; border-radius: 7px; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+  .btn-logout:hover { border-color: var(--neon-red); color: var(--neon-red); }
+
+  /* Page */
+  .page { position: relative; z-index: 10; max-width: 700px; margin: 0 auto; padding: 2.5rem 1rem; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+  .page-header { margin-bottom: 2rem; animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+  .page-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--neon-green); text-shadow: 0 0 10px rgba(0,255,136,0.4); margin-bottom: 0.4rem; }
+  .page-title { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; }
+  .page-title span { color: var(--neon-yellow); text-shadow: 0 0 16px rgba(245,255,0,0.4); }
+
+  /* Podium */
+  .podium { display: flex; align-items: flex-end; justify-content: center; gap: 0.8rem; margin-bottom: 2rem; animation: fadeUp 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) both; }
+  .podium-item { flex: 1; max-width: 180px; text-align: center; }
+  .podium-avatar { font-size: 2rem; margin-bottom: 0.4rem; display: block; }
+  .podium-name { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .podium-kloins { font-size: 0.72rem; color: var(--muted); }
+  .podium-block {
+    border-radius: 12px 12px 0 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end; padding: 0.8rem 0.5rem;
+  }
+  .podium-rank { font-size: 1.4rem; font-weight: 800; }
+  .podium-wins { font-size: 0.72rem; font-weight: 700; margin-top: 0.2rem; }
+
+  .podium-1st .podium-block { height: 120px; background: rgba(245,255,0,0.1); border: 1px solid rgba(245,255,0,0.25); }
+  .podium-1st .podium-rank { color: var(--neon-yellow); }
+  .podium-1st .podium-wins { color: rgba(245,255,0,0.6); }
+
+  .podium-2nd .podium-block { height: 90px; background: rgba(0,212,255,0.07); border: 1px solid rgba(0,212,255,0.18); }
+  .podium-2nd .podium-rank { color: var(--neon-blue); }
+  .podium-2nd .podium-wins { color: rgba(0,212,255,0.6); }
+
+  .podium-3rd .podium-block { height: 70px; background: rgba(255,106,0,0.07); border: 1px solid rgba(255,106,0,0.18); }
+  .podium-3rd .podium-rank { color: var(--neon-orange); }
+  .podium-3rd .podium-wins { color: rgba(255,106,0,0.6); }
+
+  /* Table */
+  .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; animation: fadeUp 0.4s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
+
+  .table-header { display: grid; grid-template-columns: 48px 1fr 90px 90px 110px; padding: 0.8rem 1.2rem; border-bottom: 1px solid var(--border); }
+  .table-header div { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .table-header .col-right { text-align: right; }
+
+  .table-row {
+    display: grid; grid-template-columns: 48px 1fr 90px 90px 110px;
+    padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--border);
+    align-items: center; transition: background 0.15s;
+  }
+  .table-row:last-child { border-bottom: none; }
+  .table-row:hover { background: rgba(255,255,255,0.02); }
+  .table-row.is-me { background: rgba(245,255,0,0.04); border-left: 2px solid var(--neon-yellow); }
+
+  .rank-cell { font-size: 0.9rem; font-weight: 800; color: var(--muted); }
+  .rank-1 { color: var(--neon-yellow); }
+  .rank-2 { color: var(--neon-blue); }
+  .rank-3 { color: var(--neon-orange); }
+
+  .user-cell { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+  .user-avatar { font-size: 1.2rem; flex-shrink: 0; }
+  .user-name { font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-me { font-size: 0.65rem; color: var(--muted); margin-left: 0.3rem; }
+
+  .col-num { font-size: 0.88rem; font-weight: 700; text-align: right; }
+  .col-won { color: var(--neon-green); }
+  .col-played { color: var(--muted); }
+  .col-kloins { color: var(--neon-yellow); font-size: 0.9rem; }
+
+  .empty-state { text-align: center; padding: 4rem 1rem; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+  /* Bottom Nav */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: rgba(5,5,8,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom)); display: none; grid-template-columns: repeat(4, 1fr); }
+  .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 0.4rem; text-decoration: none; color: var(--muted); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.2s; }
+  .bottom-nav-item .bn-icon { font-size: 1.3rem; }
+  .bottom-nav-item.active { color: var(--neon-yellow); }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .bottom-nav { display: grid; }
+    .page { padding-bottom: 5rem; }
+    .table-header, .table-row { grid-template-columns: 36px 1fr 60px 70px; }
+    .table-header .col-played, .table-row .col-played { display: none; }
+    .podium { gap: 0.5rem; }
+  }
+
+  #loadingScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; font-size: 2rem; animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="grid"></div>
+
+<div id="loadingScreen">⚡</div>
+
+<div id="mainPage" style="display:none">
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a class="logo" href="../dashboard/">Klaus<span>Maniac</span></a>
+      <div class="nav-links">
+        <a class="nav-link" href="../dashboard/">🏠 Home</a>
+        <a class="nav-link" href="../profile/">👤 Profil</a>
+        <a class="nav-link" href="../bets/">🏆 Tippspiel</a>
+        <a class="nav-link active" href="../highscores/">
+          🎮 Highscores <span class="nav-dot" style="background:var(--neon-green)"></span>
+        </a>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <a class="nav-avatar" id="navAvatar" href="../profile/" title="Profil">🎮</a>
+      <button class="btn-logout" onclick="logout()">Abmelden</button>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="page-header">
+      <div class="page-label">Rangliste</div>
+      <div class="page-title">High<span>scores</span> 🎮</div>
+    </div>
+
+    <div id="podiumEl" class="podium" style="display:none"></div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <div>#</div>
+        <div>Spieler</div>
+        <div class="col-right">Gewonnen</div>
+        <div class="col-right col-played">Gespielt</div>
+        <div class="col-right">Kloins</div>
+      </div>
+      <div id="tableBody">
+        <div class="empty-state">
+          <span class="empty-icon" style="animation:pulse 1s infinite">⚡</span>
+          <p>Lädt…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a class="bottom-nav-item" href="../dashboard/"><span class="bn-icon">🏠</span>Home</a>
+    <a class="bottom-nav-item" href="../profile/"><span class="bn-icon">👤</span>Profil</a>
+    <a class="bottom-nav-item" href="../bets/"><span class="bn-icon">🏆</span>Tipps</a>
+    <a class="bottom-nav-item active" href="../highscores/"><span class="bn-icon">🎮</span>Scores</a>
+  </nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+const SUPABASE_URL = 'https://tovruvmgqfsesyvlrxjr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = '../login/'; return; }
+
+  const { data: myProfile } = await sb.from('profiles').select('avatar').eq('id', session.user.id).single();
+  if (myProfile?.avatar) document.getElementById('navAvatar').textContent = myProfile.avatar;
+
+  // Load all profiles with stats, sorted by wins then kloins
+  const { data: profiles, error } = await sb.from('profiles')
+    .select('id, username, avatar, kloins, bets_won, bets_played')
+    .not('username', 'is', null)
+    .order('bets_won', { ascending: false })
+    .order('kloins', { ascending: false });
+
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('mainPage').style.display = '';
+
+  if (error || !profiles || profiles.length === 0) {
+    document.getElementById('tableBody').innerHTML = `<div class="empty-state"><span class="empty-icon">🏆</span><p>Noch keine Spieler.</p></div>`;
+    return;
+  }
+
+  renderPodium(profiles, session.user.id);
+  renderTable(profiles, session.user.id);
+}
+
+function renderPodium(profiles, myId) {
+  if (profiles.length < 2) return;
+  const podiumEl = document.getElementById('podiumEl');
+  podiumEl.style.display = 'flex';
+
+  const top3 = profiles.slice(0, 3);
+  // Reorder: 2nd, 1st, 3rd
+  const order = top3.length === 1 ? [top3[0]] :
+                top3.length === 2 ? [top3[1], top3[0]] :
+                [top3[1], top3[0], top3[2]];
+
+  const ranks = top3.length === 1 ? ['1st'] :
+                top3.length === 2 ? ['2nd','1st'] :
+                ['2nd','1st','3rd'];
+
+  const medals = { '1st': '🥇', '2nd': '🥈', '3rd': '🥉' };
+  const cls    = { '1st': 'podium-1st', '2nd': 'podium-2nd', '3rd': 'podium-3rd' };
+  const rankNum = { '1st': 1, '2nd': 2, '3rd': 3 };
+
+  podiumEl.innerHTML = order.map((p, i) => {
+    const rank = ranks[i];
+    const isMe = p.id === myId;
+    return `
+      <div class="podium-item ${cls[rank]}">
+        <span class="podium-avatar">${esc(p.avatar || '🎮')}</span>
+        <div class="podium-name${isMe ? '" style="color:var(--neon-yellow)' : ''}">${esc(p.username || 'User')}</div>
+        <div class="podium-kloins">${(p.kloins || 0).toLocaleString('de-DE')} Kloins</div>
+        <div class="podium-block">
+          <div class="podium-rank">${medals[rank]} ${rankNum[rank]}</div>
+          <div class="podium-wins">${p.bets_won || 0} Siege</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderTable(profiles, myId) {
+  document.getElementById('tableBody').innerHTML = profiles.map((p, i) => {
+    const rank = i + 1;
+    const isMe = p.id === myId;
+    const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
+    return `
+      <div class="table-row${isMe ? ' is-me' : ''}">
+        <div class="rank-cell ${rankClass}">${rank}</div>
+        <div class="user-cell">
+          <span class="user-avatar">${esc(p.avatar || '🎮')}</span>
+          <span class="user-name">${esc(p.username || 'User')}${isMe ? '<span class="user-me">(du)</span>' : ''}</span>
+        </div>
+        <div class="col-num col-won col-right">${p.bets_won || 0}</div>
+        <div class="col-num col-played col-right">${p.bets_played || 0}</div>
+        <div class="col-num col-kloins col-right">${(p.kloins || 0).toLocaleString('de-DE')}</div>
+      </div>`;
+  }).join('');
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = '../login/';
+}
+
+init();
+</script>
+</body>
+</html>

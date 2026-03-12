@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wette – KlausManiac</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050508;
+    --neon-yellow: #f5ff00;
+    --neon-blue:   #00d4ff;
+    --neon-orange: #ff6a00;
+    --neon-green:  #00ff88;
+    --neon-red:    #ff003c;
+    --card: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f0f0;
+    --muted: #555;
+    --input-bg: rgba(255,255,255,0.04);
+  }
+
+  body { font-family: 'Inter', sans-serif; background: var(--bg); min-height: 100vh; color: var(--text); position: relative; overflow-x: hidden; }
+
+  .blob { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.45; z-index: 0; }
+  .blob-1 { width: 500px; height: 500px; top: -15%; left: -10%; background: var(--neon-blue); animation: drift1 9s ease-in-out infinite alternate; }
+  .blob-2 { width: 350px; height: 350px; bottom: -5%; right: -5%; background: var(--neon-orange); animation: drift2 11s ease-in-out infinite alternate; }
+  @keyframes drift1 { from { transform: translate(0,0); } to { transform: translate(30px,40px); } }
+  @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-40px,-30px); } }
+
+  .grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 36px 36px; pointer-events: none; z-index: 0; }
+
+  /* Navbar */
+  .navbar { position: sticky; top: 0; z-index: 50; background: rgba(5,5,8,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .navbar-left { display: flex; align-items: center; gap: 2rem; }
+  .logo { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.03em; text-decoration: none; color: var(--text); flex-shrink: 0; }
+  .logo span { color: var(--neon-yellow); text-shadow: 0 0 10px rgba(245,255,0,0.5); }
+  .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+  .nav-link { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--muted); text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+  .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  .nav-link.active { color: var(--text); background: rgba(255,255,255,0.07); }
+  .nav-link.active .nav-dot { opacity: 1; }
+  .nav-dot { width: 5px; height: 5px; border-radius: 50%; opacity: 0; transition: opacity 0.2s; }
+  .navbar-right { display: flex; align-items: center; gap: 0.75rem; }
+  .nav-avatar { width: 32px; height: 32px; background: var(--bg); border: 1.5px solid var(--neon-orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; box-shadow: 0 0 10px rgba(255,106,0,0.25); text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; }
+  .nav-avatar:hover { transform: scale(1.1); box-shadow: 0 0 16px rgba(255,106,0,0.4); }
+  .btn-logout { background: transparent; border: 1px solid #1e1e1e; color: var(--muted); padding: 0.35rem 0.8rem; border-radius: 7px; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+  .btn-logout:hover { border-color: var(--neon-red); color: var(--neon-red); }
+
+  /* Page */
+  .page { position: relative; z-index: 10; max-width: 780px; margin: 0 auto; padding: 2.5rem 1rem; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+  .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 600; margin-bottom: 1.5rem; transition: color 0.2s; }
+  .back-link:hover { color: var(--text); }
+
+  /* Bet header */
+  .bet-header { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+  .bet-header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+  .bet-header-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+  .bet-header-desc { font-size: 0.88rem; color: var(--muted); margin-top: 0.5rem; line-height: 1.5; }
+  .bet-meta-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1rem; font-size: 0.8rem; color: var(--muted); }
+  .bet-meta-item strong { color: var(--text); }
+
+  .status-badge { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.2rem 0.55rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
+  .status-open     { background: rgba(0,255,136,0.12); color: var(--neon-green); border: 1px solid rgba(0,255,136,0.3); }
+  .status-closed   { background: rgba(255,255,255,0.05); color: #444; border: 1px solid #1a1a1a; }
+  .status-resolved { background: rgba(245,255,0,0.1); color: var(--neon-yellow); border: 1px solid rgba(245,255,0,0.3); }
+
+  /* Pot */
+  .pot-bar { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) both; display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap; }
+  .pot-total { text-align: center; }
+  .pot-total-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.2rem; }
+  .pot-total-val { font-size: 1.8rem; font-weight: 800; color: var(--neon-yellow); text-shadow: 0 0 20px rgba(245,255,0,0.4); }
+  .pot-sides { display: flex; gap: 1rem; }
+  .pot-side { text-align: center; }
+  .pot-side-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.2rem; }
+  .pot-side-val { font-size: 1.1rem; font-weight: 800; }
+  .side-a-color { color: var(--neon-blue); }
+  .side-b-color { color: var(--neon-orange); }
+
+  /* Sides */
+  .sides-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
+
+  .side-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.3rem; }
+  .side-card-a { border-color: rgba(0,212,255,0.15); }
+  .side-card-b { border-color: rgba(255,106,0,0.15); }
+
+  .side-card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
+  .side-card-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .side-card-dot-a { background: var(--neon-blue); box-shadow: 0 0 8px rgba(0,212,255,0.5); }
+  .side-card-dot-b { background: var(--neon-orange); box-shadow: 0 0 8px rgba(255,106,0,0.5); }
+  .side-card-label { font-size: 0.88rem; font-weight: 800; }
+  .side-card-a .side-card-label { color: var(--neon-blue); }
+  .side-card-b .side-card-label { color: var(--neon-orange); }
+
+  .participant-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; gap: 0.5rem; }
+  .participant-row:last-child { border-bottom: none; }
+  .participant-name { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 0; }
+  .participant-avatar { font-size: 1rem; flex-shrink: 0; }
+  .participant-username { font-weight: 600; truncate: true; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .participant-stake { font-size: 0.75rem; color: var(--muted); }
+  .participant-amount { font-weight: 800; font-size: 0.88rem; white-space: nowrap; }
+  .amount-a { color: var(--neon-blue); }
+  .amount-b { color: var(--neon-orange); }
+  .participant-winner { color: var(--neon-yellow); }
+  .no-participants { font-size: 0.82rem; color: var(--muted); text-align: center; padding: 1rem 0; }
+
+  /* Join card */
+  .join-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.15s cubic-bezier(0.16,1,0.3,1) both; }
+  .section-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .side-selector { display: flex; gap: 0.7rem; margin-bottom: 1rem; }
+  .side-btn { flex: 1; padding: 0.75rem; border-radius: 12px; border: 2px solid transparent; background: rgba(255,255,255,0.03); color: var(--muted); font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .side-btn-a.selected { background: rgba(0,212,255,0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
+  .side-btn-b.selected { background: rgba(255,106,0,0.1); border-color: var(--neon-orange); color: var(--neon-orange); }
+  .side-btn:hover { background: rgba(255,255,255,0.05); }
+
+  .join-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem; }
+
+  label { display: block; font-size: 0.75rem; font-weight: 700; color: #444; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.4rem; }
+
+  input[type="text"] { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 9px; padding: 0.7rem 0.9rem; color: var(--text); font-size: 0.95rem; font-family: inherit; transition: all 0.2s; }
+  input::placeholder { color: #2a2a2a; }
+  input:focus { outline: none; border-color: var(--neon-blue); background: rgba(0,212,255,0.05); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+
+  .kloins-hint { font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; }
+  .kloins-hint .kloins-val { color: var(--neon-yellow); font-weight: 800; }
+
+  .btn-join { width: 100%; padding: 0.85rem; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 800; cursor: pointer; font-family: inherit; letter-spacing: 0.02em; text-transform: uppercase; background: var(--neon-blue); color: #000; box-shadow: 0 0 16px rgba(0,212,255,0.3); transition: all 0.2s; }
+  .btn-join:hover:not(:disabled) { box-shadow: 0 0 28px rgba(0,212,255,0.5); transform: translateY(-1px); }
+  .btn-join:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* Result card */
+  .result-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.18s cubic-bezier(0.16,1,0.3,1) both; }
+
+  .winner-display { background: rgba(245,255,0,0.06); border: 1px solid rgba(245,255,0,0.2); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
+  .winner-display-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.3rem; }
+  .winner-display-val { font-size: 1.1rem; font-weight: 800; color: var(--neon-yellow); }
+  .winner-display-desc { font-size: 0.82rem; color: var(--muted); margin-top: 0.25rem; }
+
+  .result-buttons { display: flex; gap: 0.7rem; margin-bottom: 1rem; }
+  .result-btn { flex: 1; padding: 0.7rem; border-radius: 10px; border: 2px solid transparent; background: rgba(255,255,255,0.03); color: var(--muted); font-family: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .result-btn.win-a { }
+  .result-btn.win-b { }
+  .result-btn.win-draw { }
+  .result-btn.sel-a { background: rgba(0,212,255,0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
+  .result-btn.sel-b { background: rgba(255,106,0,0.1); border-color: var(--neon-orange); color: var(--neon-orange); }
+  .result-btn.sel-draw { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.3); color: var(--text); }
+  .result-btn:hover { background: rgba(255,255,255,0.05); }
+
+  textarea { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 9px; padding: 0.7rem 0.9rem; color: var(--text); font-size: 0.9rem; font-family: inherit; transition: all 0.2s; resize: vertical; min-height: 70px; }
+  textarea:focus { outline: none; border-color: var(--neon-blue); background: rgba(0,212,255,0.05); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+  textarea::placeholder { color: #2a2a2a; }
+
+  .btn-resolve { width: 100%; padding: 0.85rem; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 800; cursor: pointer; font-family: inherit; letter-spacing: 0.02em; text-transform: uppercase; background: var(--neon-green); color: #000; box-shadow: 0 0 16px rgba(0,255,136,0.3); transition: all 0.2s; margin-top: 0.8rem; }
+  .btn-resolve:hover:not(:disabled) { box-shadow: 0 0 28px rgba(0,255,136,0.5); transform: translateY(-1px); }
+  .btn-resolve:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* History */
+  .history-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.22s cubic-bezier(0.16,1,0.3,1) both; }
+  .history-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+  .history-toggle-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  .history-toggle-icon { color: var(--muted); font-size: 0.9rem; transition: transform 0.2s; }
+  .history-toggle-icon.open { transform: rotate(180deg); }
+  .history-entries { margin-top: 1rem; display: none; }
+  .history-entries.open { display: block; }
+  .history-entry { padding: 0.8rem 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+  .history-entry:last-child { border-bottom: none; }
+  .history-entry-header { display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
+  .history-entry-by { font-weight: 700; }
+  .history-entry-time { color: var(--muted); font-size: 0.75rem; }
+  .history-entry-change { color: var(--muted); }
+  .history-entry-change strong { color: var(--text); }
+
+  .alert { display: none; padding: 0.7rem 0.9rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; }
+  .alert.error   { display: block; background: rgba(255,0,60,0.1); border: 1px solid rgba(255,0,60,0.3); color: #ff6b8a; }
+  .alert.success { display: block; background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25); color: var(--neon-green); }
+
+  /* Bottom Nav */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: rgba(5,5,8,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom)); display: none; grid-template-columns: repeat(4, 1fr); }
+  .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 0.4rem; text-decoration: none; color: var(--muted); font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.2s; }
+  .bottom-nav-item .bn-icon { font-size: 1.3rem; }
+  .bottom-nav-item.active { color: var(--neon-yellow); }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .bottom-nav { display: grid; }
+    .page { padding-bottom: 5rem; }
+    .sides-grid { grid-template-columns: 1fr; }
+    .join-row { grid-template-columns: 1fr; }
+    .result-buttons { flex-direction: column; }
+    .pot-bar { gap: 1rem; }
+  }
+
+  #loadingScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; font-size: 2rem; animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="grid"></div>
+
+<div id="loadingScreen">⚡</div>
+
+<div id="mainPage" style="display:none">
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a class="logo" href="../../dashboard/">Klaus<span>Maniac</span></a>
+      <div class="nav-links">
+        <a class="nav-link" href="../../dashboard/">🏠 Home</a>
+        <a class="nav-link" href="../../profile/">👤 Profil</a>
+        <a class="nav-link active" href="../../bets/">
+          🏆 Tippspiel <span class="nav-dot" style="background:var(--neon-blue)"></span>
+        </a>
+        <a class="nav-link" href="../../highscores/">🎮 Highscores</a>
+      </div>
+    </div>
+    <div class="navbar-right">
+      <a class="nav-avatar" id="navAvatar" href="../../profile/" title="Profil">🎮</a>
+      <button class="btn-logout" onclick="logout()">Abmelden</button>
+    </div>
+  </nav>
+
+  <div class="page">
+    <a class="back-link" href="../../bets/">← Alle Wetten</a>
+
+    <div id="alertBox" class="alert"></div>
+
+    <!-- Bet Header -->
+    <div class="bet-header" id="betHeader"></div>
+
+    <!-- Pot -->
+    <div class="pot-bar" id="potBar"></div>
+
+    <!-- Sides -->
+    <div class="sides-grid" id="sidesGrid"></div>
+
+    <!-- Join (if open + not yet joined) -->
+    <div class="join-card" id="joinCard" style="display:none">
+      <div class="section-title">🎯 Mitmachen</div>
+      <div class="side-selector">
+        <button class="side-btn side-btn-a" id="joinBtnA" onclick="selectJoinSide('A')">…</button>
+        <button class="side-btn side-btn-b" id="joinBtnB" onclick="selectJoinSide('B')">…</button>
+      </div>
+      <div class="join-row">
+        <div>
+          <label>Einsatz (Kloins) *</label>
+          <input type="text" id="joinAmount" placeholder="z. B. 100" maxlength="7" value="100">
+        </div>
+        <div>
+          <label>Einsatzbeschreibung</label>
+          <input type="text" id="joinStakeDesc" placeholder="z. B. Ehrenwort!" maxlength="100">
+        </div>
+      </div>
+      <div class="kloins-hint">Dein Kontostand: <span class="kloins-val" id="joinKloinsBalance">…</span> Kloins</div>
+      <button class="btn-join" id="btnJoin" onclick="joinBet()">Jetzt einsteigen →</button>
+    </div>
+
+    <!-- Result -->
+    <div class="result-card" id="resultCard" style="display:none">
+      <div class="section-title">🏁 Ergebnis eintragen</div>
+      <div id="currentResult" style="display:none"></div>
+      <div style="margin-bottom:0.8rem;font-size:0.82rem;color:var(--muted);">Gewinner-Seite wählen:</div>
+      <div class="result-buttons" id="resultBtns"></div>
+      <div style="margin-top:0.8rem">
+        <label>Ergebnisbeschreibung</label>
+        <textarea id="resultDesc" placeholder="Was ist passiert?"></textarea>
+      </div>
+      <button class="btn-resolve" id="btnResolve" onclick="submitResult()">Ergebnis speichern →</button>
+    </div>
+
+    <!-- History -->
+    <div class="history-card" id="historyCard" style="display:none">
+      <div class="history-toggle" onclick="toggleHistory()">
+        <div class="history-toggle-label">📝 Änderungshistorie</div>
+        <div class="history-toggle-icon" id="historyIcon">▼</div>
+      </div>
+      <div class="history-entries" id="historyEntries"></div>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <a class="bottom-nav-item" href="../../dashboard/"><span class="bn-icon">🏠</span>Home</a>
+    <a class="bottom-nav-item" href="../../profile/"><span class="bn-icon">👤</span>Profil</a>
+    <a class="bottom-nav-item active" href="../../bets/"><span class="bn-icon">🏆</span>Tipps</a>
+    <a class="bottom-nav-item" href="../../highscores/"><span class="bn-icon">🎮</span>Scores</a>
+  </nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+const SUPABASE_URL = 'https://tovruvmgqfsesyvlrxjr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let userKloins = 1000;
+let bet = null;
+let participants = [];
+let profiles = {};
+let joinSide = null;
+let resultSide = null;
+const betId = new URLSearchParams(location.search).get('id');
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = '../../login/'; return; }
+  currentUser = session.user;
+
+  if (!betId) { window.location.href = '../../bets/'; return; }
+
+  const [betRes, partRes, profileRes] = await Promise.all([
+    sb.from('bets').select('*').eq('id', betId).single(),
+    sb.from('bet_participants').select('*').eq('bet_id', betId),
+    sb.from('profiles').select('id, username, avatar, kloins').eq('id', currentUser.id).single()
+  ]);
+
+  if (betRes.error || !betRes.data) { window.location.href = '../../bets/'; return; }
+  bet = betRes.data;
+  participants = partRes.data || [];
+
+  if (profileRes.data) {
+    if (profileRes.data.avatar) document.getElementById('navAvatar').textContent = profileRes.data.avatar;
+    userKloins = profileRes.data.kloins ?? 1000;
+  }
+
+  // Load all participant profiles
+  const userIds = [...new Set(participants.map(p => p.user_id))];
+  if (userIds.length > 0) {
+    const { data: profs } = await sb.from('profiles').select('id, username, avatar').in('id', userIds);
+    (profs || []).forEach(p => { profiles[p.id] = p; });
+  }
+
+  renderBetHeader();
+  renderPot();
+  renderSides();
+  renderJoin();
+  renderResult();
+  await renderHistory();
+
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('mainPage').style.display = '';
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function renderBetHeader() {
+  const statusClass = { open:'status-open', closed:'status-closed', resolved:'status-resolved' }[bet.status];
+  const statusLabel = { open:'Offen', closed:'Geschlossen', resolved:'Abgerechnet' }[bet.status];
+  document.getElementById('betHeader').innerHTML = `
+    <div class="bet-header-top">
+      <div class="bet-header-title">${esc(bet.title)}</div>
+      <span class="status-badge ${statusClass}">${statusLabel}</span>
+    </div>
+    ${bet.description ? `<div class="bet-header-desc">${esc(bet.description)}</div>` : ''}
+    <div class="bet-meta-row">
+      <div class="bet-meta-item">Endet: <strong>${fmtDate(bet.ends_at)}</strong></div>
+      ${bet.resolved_at ? `<div class="bet-meta-item">Abgerechnet: <strong>${fmtDate(bet.resolved_at)}</strong></div>` : ''}
+    </div>`;
+}
+
+function renderPot() {
+  const sideA = participants.filter(p => p.side === 'A').reduce((s,p) => s+p.amount, 0);
+  const sideB = participants.filter(p => p.side === 'B').reduce((s,p) => s+p.amount, 0);
+  const total = sideA + sideB;
+  document.getElementById('potBar').innerHTML = `
+    <div class="pot-total">
+      <div class="pot-total-label">Gesamtpot</div>
+      <div class="pot-total-val">💰 ${total.toLocaleString('de-DE')} Kloins</div>
+    </div>
+    <div class="pot-sides">
+      <div class="pot-side">
+        <div class="pot-side-label side-a-color">${esc(bet.side_a_label)}</div>
+        <div class="pot-side-val side-a-color">${sideA.toLocaleString('de-DE')}</div>
+      </div>
+      <div class="pot-side" style="color:var(--muted);align-self:center;font-weight:800;font-size:0.8rem;">VS</div>
+      <div class="pot-side">
+        <div class="pot-side-label side-b-color">${esc(bet.side_b_label)}</div>
+        <div class="pot-side-val side-b-color">${sideB.toLocaleString('de-DE')}</div>
+      </div>
+    </div>`;
+}
+
+function renderSides() {
+  const partsA = participants.filter(p => p.side === 'A');
+  const partsB = participants.filter(p => p.side === 'B');
+
+  function participantRows(parts, colorClass) {
+    if (parts.length === 0) return '<div class="no-participants">Noch niemand</div>';
+    return parts.map(p => {
+      const prof = profiles[p.user_id] || {};
+      const isWinner = bet.status === 'resolved' && bet.winner_side === p.side;
+      const isMe = p.user_id === currentUser.id;
+      return `<div class="participant-row">
+        <div class="participant-name">
+          <span class="participant-avatar">${esc(prof.avatar || '🎮')}</span>
+          <div>
+            <div class="participant-username ${isMe ? '' : ''}">${esc(prof.username || 'User')}${isMe ? ' <span style="color:var(--muted);font-size:0.7rem">(du)</span>' : ''}</div>
+            ${p.stake_description ? `<div class="participant-stake">${esc(p.stake_description)}</div>` : ''}
+          </div>
+        </div>
+        <div class="participant-amount ${colorClass} ${isWinner ? 'participant-winner' : ''}">${isWinner ? '🏆 ' : ''}${p.amount.toLocaleString('de-DE')}</div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('sidesGrid').innerHTML = `
+    <div class="side-card side-card-a">
+      <div class="side-card-header">
+        <div class="side-card-dot side-card-dot-a"></div>
+        <div class="side-card-label">${esc(bet.side_a_label)}</div>
+      </div>
+      ${participantRows(partsA, 'amount-a')}
+    </div>
+    <div class="side-card side-card-b">
+      <div class="side-card-header">
+        <div class="side-card-dot side-card-dot-b"></div>
+        <div class="side-card-label">${esc(bet.side_b_label)}</div>
+      </div>
+      ${participantRows(partsB, 'amount-b')}
+    </div>`;
+}
+
+function renderJoin() {
+  const alreadyJoined = participants.some(p => p.user_id === currentUser.id);
+  const canJoin = (bet.status === 'open') && !alreadyJoined;
+  const joinCard = document.getElementById('joinCard');
+  if (!canJoin) { joinCard.style.display = 'none'; return; }
+  joinCard.style.display = '';
+  document.getElementById('joinBtnA').textContent = bet.side_a_label;
+  document.getElementById('joinBtnB').textContent = bet.side_b_label;
+  document.getElementById('joinKloinsBalance').textContent = userKloins.toLocaleString('de-DE');
+}
+
+function selectJoinSide(side) {
+  joinSide = side;
+  document.getElementById('joinBtnA').classList.toggle('selected', side === 'A');
+  document.getElementById('joinBtnB').classList.toggle('selected', side === 'B');
+}
+
+async function joinBet() {
+  if (!joinSide) return showAlert('Bitte eine Seite wählen.', 'error');
+  const amount = parseInt(document.getElementById('joinAmount').value.replace(/[^0-9]/g,''), 10);
+  if (!amount || amount <= 0) return showAlert('Bitte einen Einsatz eingeben.', 'error');
+  if (amount > userKloins) return showAlert(`Du hast nur ${userKloins.toLocaleString('de-DE')} Kloins.`, 'error');
+
+  const stakeDesc = document.getElementById('joinStakeDesc').value.trim();
+  document.getElementById('btnJoin').disabled = true;
+  document.getElementById('btnJoin').textContent = 'Einsteigen…';
+
+  const { error } = await sb.from('bet_participants').insert({
+    bet_id: betId, user_id: currentUser.id, side: joinSide, amount, stake_description: stakeDesc || null
+  });
+
+  if (error) {
+    document.getElementById('btnJoin').disabled = false;
+    document.getElementById('btnJoin').textContent = 'Jetzt einsteigen →';
+    return showAlert('Fehler: ' + error.message, 'error');
+  }
+
+  await sb.from('profiles').update({ kloins: userKloins - amount }).eq('id', currentUser.id);
+  showAlert('✓ Erfolgreich eingestiegen!', 'success');
+  setTimeout(() => location.reload(), 900);
+}
+
+function renderResult() {
+  const resultCard = document.getElementById('resultCard');
+  // Show result card if open or closed (allow any logged-in user)
+  if (bet.status === 'resolved') {
+    // Show current result display but not the form
+    const current = document.getElementById('currentResult');
+    const sideLabel = { A: bet.side_a_label, B: bet.side_b_label, draw: 'Unentschieden' }[bet.winner_side] || '';
+    current.style.display = '';
+    current.innerHTML = `
+      <div class="winner-display" style="margin-bottom:1rem">
+        <div class="winner-display-label">Ergebnis</div>
+        <div class="winner-display-val">🏆 ${esc(sideLabel)} gewinnt</div>
+        ${bet.result_description ? `<div class="winner-display-desc">${esc(bet.result_description)}</div>` : ''}
+      </div>`;
+    // Still allow changing result
+    resultCard.style.display = '';
+  } else {
+    resultCard.style.display = '';
+  }
+
+  // Build result buttons
+  const btns = document.getElementById('resultBtns');
+  btns.innerHTML = `
+    <button class="result-btn win-a" id="rbA" onclick="selectResult('A')">${esc(bet.side_a_label)} gewinnt</button>
+    <button class="result-btn win-b" id="rbB" onclick="selectResult('B')">${esc(bet.side_b_label)} gewinnt</button>
+    <button class="result-btn win-draw" id="rbDraw" onclick="selectResult('draw')">Unentschieden</button>`;
+
+  // Pre-fill if already resolved
+  if (bet.winner_side) {
+    selectResult(bet.winner_side);
+    if (bet.result_description) document.getElementById('resultDesc').value = bet.result_description;
+    document.getElementById('btnResolve').textContent = 'Ergebnis ändern →';
+  }
+
+  document.getElementById('resultCard').querySelector('.section-title').textContent =
+    bet.status === 'resolved' ? '🏁 Ergebnis bearbeiten' : '🏁 Ergebnis eintragen';
+}
+
+function selectResult(side) {
+  resultSide = side;
+  document.getElementById('rbA').className    = 'result-btn win-a' + (side==='A' ? ' sel-a' : '');
+  document.getElementById('rbB').className    = 'result-btn win-b' + (side==='B' ? ' sel-b' : '');
+  document.getElementById('rbDraw').className = 'result-btn win-draw' + (side==='draw' ? ' sel-draw' : '');
+}
+
+async function submitResult() {
+  if (!resultSide) return showAlert('Bitte einen Gewinner wählen.', 'error');
+  const desc = document.getElementById('resultDesc').value.trim();
+
+  document.getElementById('btnResolve').disabled = true;
+  document.getElementById('btnResolve').textContent = 'Speichert…';
+
+  // Save history entry first (if there was a previous result)
+  if (bet.winner_side) {
+    await sb.from('bet_result_history').insert({
+      bet_id: betId,
+      changed_by: currentUser.id,
+      old_result: bet.result_description || null,
+      new_result: desc || null,
+      old_winner_side: bet.winner_side,
+      new_winner_side: resultSide
+    });
+  }
+
+  // Update bet
+  const { error } = await sb.from('bets').update({
+    status: 'resolved',
+    winner_side: resultSide,
+    result_description: desc || null,
+    resolved_at: new Date().toISOString(),
+    resolved_by: currentUser.id
+  }).eq('id', betId);
+
+  if (error) {
+    document.getElementById('btnResolve').disabled = false;
+    document.getElementById('btnResolve').textContent = 'Ergebnis speichern →';
+    return showAlert('Fehler: ' + error.message, 'error');
+  }
+
+  // Distribute kloins (only if first resolution or side changed)
+  const wasResolved = bet.status === 'resolved';
+  const sideChanged = bet.winner_side !== resultSide;
+
+  if (!wasResolved || sideChanged) {
+    await distributeKloins(resultSide, wasResolved ? bet.winner_side : null);
+  }
+
+  showAlert('✓ Ergebnis gespeichert!', 'success');
+  setTimeout(() => location.reload(), 900);
+}
+
+async function distributeKloins(winnerSide, previousWinnerSide) {
+  // If re-resolving: first undo previous distribution by recalculating
+  // Simpler: just recalculate everything from current participants
+
+  const total = participants.reduce((s, p) => s + p.amount, 0);
+  const winners = participants.filter(p => p.side === winnerSide);
+  const winnerSum = winners.reduce((s, p) => s + p.amount, 0);
+  const loserPot = total - winnerSum;
+
+  const updates = [];
+
+  if (winnerSide === 'draw') {
+    // Everyone gets their stake back — load current kloins and add back
+    for (const p of participants) {
+      const { data: prof } = await sb.from('profiles').select('kloins, bets_played').eq('id', p.user_id).single();
+      const currentKloins = prof?.kloins ?? 0;
+      const currentPlayed = prof?.bets_played ?? 0;
+      updates.push(
+        sb.from('profiles').update({
+          kloins: currentKloins + p.amount,
+          bets_played: currentPlayed + (previousWinnerSide ? 0 : 1)
+        }).eq('id', p.user_id)
+      );
+    }
+  } else {
+    for (const p of participants) {
+      const { data: prof } = await sb.from('profiles').select('kloins, bets_won, bets_played').eq('id', p.user_id).single();
+      const currentKloins = prof?.kloins ?? 0;
+      const currentWon = prof?.bets_won ?? 0;
+      const currentPlayed = prof?.bets_played ?? 0;
+      const isWinner = p.side === winnerSide;
+
+      let payout = 0;
+      if (isWinner && winnerSum > 0) {
+        payout = p.amount + Math.floor((p.amount / winnerSum) * loserPot);
+      }
+
+      updates.push(
+        sb.from('profiles').update({
+          kloins: currentKloins + payout,
+          bets_won: isWinner ? currentWon + 1 : currentWon,
+          bets_played: currentPlayed + (previousWinnerSide ? 0 : 1)
+        }).eq('id', p.user_id)
+      );
+    }
+  }
+
+  await Promise.all(updates);
+}
+
+async function renderHistory() {
+  const { data: history } = await sb.from('bet_result_history')
+    .select('*').eq('bet_id', betId).order('changed_at', { ascending: false });
+
+  if (!history || history.length === 0) {
+    document.getElementById('historyCard').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('historyCard').style.display = '';
+
+  // Load changer profiles
+  const changerIds = [...new Set(history.map(h => h.changed_by))];
+  const { data: changerProfs } = await sb.from('profiles').select('id, username, avatar').in('id', changerIds);
+  const changerMap = {};
+  (changerProfs || []).forEach(p => { changerMap[p.id] = p; });
+
+  const sideLabel = s => s === 'A' ? bet.side_a_label : s === 'B' ? bet.side_b_label : 'Unentschieden';
+
+  document.getElementById('historyEntries').innerHTML = history.map(h => {
+    const changer = changerMap[h.changed_by] || {};
+    return `
+      <div class="history-entry">
+        <div class="history-entry-header">
+          <span class="history-entry-by">${esc(changer.avatar || '🎮')} ${esc(changer.username || 'User')}</span>
+          <span class="history-entry-time">${fmtDate(h.changed_at)}</span>
+        </div>
+        <div class="history-entry-change">
+          <strong>${esc(sideLabel(h.old_winner_side))}</strong> → <strong>${esc(sideLabel(h.new_winner_side))}</strong>
+          ${h.old_result ? ` | ${esc(h.old_result)}` : ''}
+          ${h.new_result ? ` → ${esc(h.new_result)}` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleHistory() {
+  const entries = document.getElementById('historyEntries');
+  const icon = document.getElementById('historyIcon');
+  entries.classList.toggle('open');
+  icon.classList.toggle('open');
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = '../../login/';
+}
+
+function showAlert(msg, type) {
+  const el = document.getElementById('alertBox');
+  el.textContent = msg; el.className = 'alert ' + type;
+  if (type === 'error') setTimeout(() => { el.className = 'alert'; }, 4000);
+}
+
+init();
+</script>
+</body>
+</html>

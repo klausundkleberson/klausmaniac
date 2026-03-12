@@ -106,10 +106,12 @@
     width: 90px; height: 90px; background: var(--bg);
     border: 2px solid var(--neon-orange); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 2.5rem; flex-shrink: 0;
+    font-size: 2.5rem; flex-shrink: 0; overflow: hidden;
     box-shadow: 0 0 20px rgba(255,106,0,0.4), 0 0 50px rgba(255,106,0,0.15);
     cursor: pointer; transition: transform 0.2s; position: relative;
   }
+  #avatarImg { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none; }
+  .nav-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .avatar-display:hover { transform: scale(1.05); }
   .avatar-edit-hint {
     position: absolute; bottom: -4px; right: -4px;
@@ -122,12 +124,24 @@
   .avatar-info p  { font-size: 0.82rem; color: var(--muted); }
 
   .emoji-picker {
-    display: none; flex-wrap: wrap; gap: 0.5rem;
+    display: none;
+    flex-direction: column; gap: 0;
     background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-    border-radius: 12px; padding: 1rem; margin-bottom: 1.2rem;
+    border-radius: 12px; overflow: hidden; margin-bottom: 1.2rem;
     animation: fadeUp 0.3s cubic-bezier(0.16,1,0.3,1) both;
   }
   .emoji-picker.open { display: flex; }
+
+  .picker-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .picker-tab {
+    flex: 1; padding: 0.6rem; font-size: 0.8rem; font-weight: 700;
+    font-family: inherit; background: none; border: none; color: var(--muted);
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em;
+  }
+  .picker-tab.active { color: var(--neon-yellow); background: rgba(245,255,0,0.05); border-bottom: 2px solid var(--neon-yellow); }
+
+  .picker-tab-content { padding: 1rem; }
+  .emoji-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
   .emoji-option {
     width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
@@ -136,6 +150,35 @@
   }
   .emoji-option:hover { background: rgba(255,255,255,0.1); border-color: var(--neon-yellow); transform: scale(1.1); }
   .emoji-option.selected { border-color: var(--neon-orange); background: rgba(255,106,0,0.1); box-shadow: 0 0 10px rgba(255,106,0,0.3); }
+
+  .upload-area {
+    border: 2px dashed var(--border); border-radius: 10px; padding: 1.5rem;
+    text-align: center; cursor: pointer; transition: all 0.2s;
+  }
+  .upload-area:hover { border-color: var(--neon-blue); background: rgba(0,212,255,0.04); }
+  .upload-area.drag-over { border-color: var(--neon-blue); background: rgba(0,212,255,0.08); }
+  .upload-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .upload-label { font-size: 0.85rem; color: var(--muted); }
+  .upload-hint { font-size: 0.72rem; color: #333; margin-top: 0.3rem; }
+
+  .upload-preview {
+    display: none; align-items: center; gap: 0.75rem; margin-top: 0.75rem;
+    background: rgba(255,255,255,0.03); border-radius: 8px; padding: 0.6rem;
+  }
+  .upload-preview.show { display: flex; }
+  .upload-preview img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--neon-orange); }
+  .upload-preview-info { flex: 1; min-width: 0; }
+  .upload-preview-name { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .upload-preview-size { font-size: 0.72rem; color: var(--muted); }
+
+  .btn-upload {
+    width: 100%; margin-top: 0.75rem; padding: 0.65rem;
+    border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 800;
+    font-family: inherit; cursor: pointer; background: var(--neon-blue); color: #000;
+    box-shadow: 0 0 16px rgba(0,212,255,0.25); transition: all 0.2s;
+  }
+  .btn-upload:hover:not(:disabled) { box-shadow: 0 0 28px rgba(0,212,255,0.45); }
+  .btn-upload:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) both; }
 
@@ -250,8 +293,8 @@
         <a class="nav-link active" href="../profile/">
           👤 Profil <span class="nav-dot" style="background:var(--neon-orange)"></span>
         </a>
-        <span class="nav-link" style="cursor:default">🏆 Tippspiel <span class="nav-link-soon">Soon</span></span>
-        <span class="nav-link" style="cursor:default">🎮 Highscores <span class="nav-link-soon">Soon</span></span>
+        <a class="nav-link" href="../bets/">🏆 Tippspiel</a>
+        <a class="nav-link" href="../highscores/">🎮 Highscores</a>
       </div>
     </div>
     <div class="navbar-right">
@@ -264,6 +307,7 @@
 
     <div class="avatar-section">
       <div class="avatar-display" id="avatarDisplay" onclick="toggleEmojiPicker()">
+        <img id="avatarImg" alt="Avatar">
         <span id="avatarEmoji">🎮</span>
         <div class="avatar-edit-hint">✏️</div>
       </div>
@@ -274,7 +318,32 @@
       </div>
     </div>
 
-    <div class="emoji-picker" id="emojiPicker"></div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+    <div class="emoji-picker" id="emojiPicker">
+      <div class="picker-tabs">
+        <button class="picker-tab active" onclick="switchTab('emoji')">😄 Emoji</button>
+        <button class="picker-tab" onclick="switchTab('image')">📷 Bild hochladen</button>
+      </div>
+      <div class="picker-tab-content" id="tabEmoji">
+        <div class="emoji-grid" id="emojiGrid"></div>
+      </div>
+      <div class="picker-tab-content" id="tabImage" style="display:none">
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+          <div class="upload-icon">📁</div>
+          <div class="upload-label">Bild auswählen oder hierher ziehen</div>
+          <div class="upload-hint">JPG, PNG, GIF, WebP · max. 5 MB</div>
+        </div>
+        <div class="upload-preview" id="uploadPreview">
+          <img id="previewImg" alt="Vorschau">
+          <div class="upload-preview-info">
+            <div class="upload-preview-name" id="previewName"></div>
+            <div class="upload-preview-size" id="previewSize"></div>
+          </div>
+        </div>
+        <button class="btn-upload" id="btnUpload" onclick="uploadImage()" disabled>Bild speichern →</button>
+      </div>
+    </div>
 
     <div id="alertBox" class="alert"></div>
 
@@ -302,8 +371,8 @@
   <nav class="bottom-nav">
     <a class="bottom-nav-item" href="../dashboard/"><span class="bn-icon">🏠</span>Home</a>
     <a class="bottom-nav-item active" href="../profile/"><span class="bn-icon">👤</span>Profil</a>
-    <span class="bottom-nav-item"><span class="bn-icon">🏆</span>Tipps</span>
-    <span class="bottom-nav-item"><span class="bn-icon">🎮</span>Scores</span>
+    <a class="bottom-nav-item" href="../bets/"><span class="bn-icon">🏆</span>Tipps</a>
+    <a class="bottom-nav-item" href="../highscores/"><span class="bn-icon">🎮</span>Scores</a>
   </nav>
 
 </div>
@@ -319,6 +388,8 @@ const EMOJIS = ['🎮','👾','🕹️','🏆','🔥','⚡','💀','👑','🦁'
 
 let currentUser = null;
 let selectedEmoji = '🎮';
+let selectedFile = null;
+let avatarImageUrl = null;
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
@@ -326,19 +397,28 @@ async function init() {
   currentUser = session.user;
   document.getElementById('emailDisplay').textContent = currentUser.email;
   buildEmojiPicker();
+  setupFileInput();
   await loadProfile();
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('mainPage').style.display = '';
 }
 
 function buildEmojiPicker() {
-  const picker = document.getElementById('emojiPicker');
+  const grid = document.getElementById('emojiGrid');
   EMOJIS.forEach(e => {
     const el = document.createElement('div');
     el.className = 'emoji-option' + (e === selectedEmoji ? ' selected' : '');
     el.textContent = e;
     el.onclick = () => selectEmoji(e);
-    picker.appendChild(el);
+    grid.appendChild(el);
+  });
+}
+
+function switchTab(tab) {
+  document.getElementById('tabEmoji').style.display = tab === 'emoji' ? '' : 'none';
+  document.getElementById('tabImage').style.display = tab === 'image' ? '' : 'none';
+  document.querySelectorAll('.picker-tab').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0) === (tab === 'emoji'));
   });
 }
 
@@ -348,10 +428,91 @@ function toggleEmojiPicker() {
 
 function selectEmoji(emoji) {
   selectedEmoji = emoji;
+  avatarImageUrl = null;
   document.getElementById('avatarEmoji').textContent = emoji;
-  document.getElementById('navAvatar').textContent = emoji;
+  document.getElementById('avatarEmoji').style.display = '';
+  document.getElementById('avatarImg').style.display = 'none';
+  const nav = document.getElementById('navAvatar');
+  nav.textContent = '';
+  nav.textContent = emoji;
   document.querySelectorAll('.emoji-option').forEach(el => el.classList.toggle('selected', el.textContent === emoji));
   document.getElementById('emojiPicker').classList.remove('open');
+}
+
+function setAvatarImage(url) {
+  avatarImageUrl = url;
+  const img = document.getElementById('avatarImg');
+  img.src = url;
+  img.style.display = 'block';
+  document.getElementById('avatarEmoji').style.display = 'none';
+  const nav = document.getElementById('navAvatar');
+  nav.textContent = '';
+  const navImg = document.createElement('img');
+  navImg.src = url;
+  nav.appendChild(navImg);
+}
+
+function setupFileInput() {
+  const input = document.getElementById('fileInput');
+  const area = document.getElementById('uploadArea');
+
+  input.addEventListener('change', () => handleFile(input.files[0]));
+
+  area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('drag-over'); });
+  area.addEventListener('dragleave', () => area.classList.remove('drag-over'));
+  area.addEventListener('drop', e => {
+    e.preventDefault();
+    area.classList.remove('drag-over');
+    handleFile(e.dataTransfer.files[0]);
+  });
+}
+
+function handleFile(file) {
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showAlert('Nur Bilddateien erlaubt.', 'error'); return; }
+  if (file.size > 5 * 1024 * 1024) { showAlert('Bild zu groß – max. 5 MB erlaubt.', 'error'); return; }
+
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('previewImg').src = e.target.result;
+    document.getElementById('previewName').textContent = file.name;
+    document.getElementById('previewSize').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+    document.getElementById('uploadPreview').classList.add('show');
+    document.getElementById('btnUpload').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadImage() {
+  if (!selectedFile) return;
+  const btn = document.getElementById('btnUpload');
+  btn.disabled = true;
+  btn.textContent = 'Lädt hoch…';
+
+  const ext = selectedFile.name.split('.').pop();
+  const path = `${currentUser.id}/avatar.${ext}`;
+
+  const { error: upErr } = await sb.storage.from('avatars').upload(path, selectedFile, { upsert: true, contentType: selectedFile.type });
+  if (upErr) {
+    showAlert('Upload fehlgeschlagen: ' + upErr.message, 'error');
+    btn.disabled = false; btn.textContent = 'Bild speichern →';
+    return;
+  }
+
+  const { data: { publicUrl } } = sb.storage.from('avatars').getPublicUrl(path);
+  const urlWithBust = publicUrl + '?t=' + Date.now();
+
+  const { error: dbErr } = await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: urlWithBust });
+  if (dbErr) { showAlert('Fehler beim Speichern: ' + dbErr.message, 'error'); }
+  else {
+    setAvatarImage(urlWithBust);
+    showAlert('✓ Bild gespeichert!', 'success');
+    document.getElementById('emojiPicker').classList.remove('open');
+  }
+
+  btn.disabled = false; btn.textContent = 'Bild speichern →';
+  selectedFile = null;
 }
 
 async function loadProfile() {
@@ -363,7 +524,11 @@ async function loadProfile() {
     document.getElementById('s3').value = data.siegesspruch_3 || '';
     document.getElementById('s4').value = data.siegesspruch_4 || '';
     document.getElementById('s5').value = data.siegesspruch_5 || '';
-    if (data.avatar) selectEmoji(data.avatar);
+    if (data.avatar_url) {
+      setAvatarImage(data.avatar_url);
+    } else if (data.avatar) {
+      selectEmoji(data.avatar);
+    }
     updateHeader(data.username);
   }
 }
@@ -376,7 +541,8 @@ async function saveProfile() {
   const username = document.getElementById('fUsername').value.trim();
   if (!username) { showAlert('Bitte gib einen Anzeigenamen ein.', 'error'); return; }
   const payload = {
-    id: currentUser.id, username, avatar: selectedEmoji,
+    id: currentUser.id, username,
+    avatar: avatarImageUrl ? null : selectedEmoji,
     siegesspruch_1: document.getElementById('s1').value.trim() || null,
     siegesspruch_2: document.getElementById('s2').value.trim() || null,
     siegesspruch_3: document.getElementById('s3').value.trim() || null,

@@ -247,21 +247,15 @@
     <!-- Join (if open + not yet joined) -->
     <div class="join-card" id="joinCard" style="display:none">
       <div class="section-title">🎯 Mitmachen</div>
-      <div class="side-selector">
+      <div class="side-selector" style="margin-bottom:1rem">
         <button class="side-btn side-btn-a" id="joinBtnA" onclick="selectJoinSide('A')">…</button>
         <button class="side-btn side-btn-b" id="joinBtnB" onclick="selectJoinSide('B')">…</button>
       </div>
-      <div class="join-row">
-        <div>
-          <label>Einsatz (Kloins) *</label>
-          <input type="text" id="joinAmount" placeholder="z. B. 100" maxlength="7" value="100">
-        </div>
-        <div>
-          <label>Einsatzbeschreibung</label>
-          <input type="text" id="joinStakeDesc" placeholder="z. B. Ehrenwort!" maxlength="100">
-        </div>
+      <div style="margin-bottom:0.8rem">
+        <label style="display:block;font-size:0.75rem;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.5rem">Einsatzart *</label>
+        <div id="joinStakeTypes" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.8rem"></div>
+        <div id="joinStakeFields"></div>
       </div>
-      <div class="kloins-hint">Dein Kontostand: <span class="kloins-val" id="joinKloinsBalance">…</span> Kloins</div>
       <button class="btn-join" id="btnJoin" onclick="joinBet()">Jetzt einsteigen →</button>
     </div>
 
@@ -305,12 +299,36 @@ const SUPABASE_URL = 'https://tovruvmgqfsesyvlrxjr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+const STAKE_TYPES = [
+  { id: 'kloins',    icon: '💰', label: 'Kloins',         placeholder: 'Betrag (z.B. 200)',       isKloins: true  },
+  { id: 'geld',      icon: '💵', label: 'Geld',           placeholder: 'z.B. 20€',                isKloins: false },
+  { id: 'gegenstand',icon: '🎁', label: 'Gegenstand',     placeholder: 'z.B. Meine Sonnenbrille', isKloins: false },
+  { id: 'aufgabe',   icon: '🏋️', label: 'Aufgabe',        placeholder: 'z.B. 100 Liegestütze',    isKloins: false },
+  { id: 'getraenke', icon: '🍺', label: 'Getränke',       placeholder: 'z.B. 3 Bier ausgeben',    isKloins: false },
+  { id: 'essen',     icon: '🍕', label: 'Essen',          placeholder: 'z.B. Pizza für alle',     isKloins: false },
+  { id: 'pflicht',   icon: '😳', label: 'Pflicht',        placeholder: 'z.B. Shirtlos zum Bäcker',isKloins: false },
+  { id: 'gaming',    icon: '🎮', label: 'Game-Challenge', placeholder: 'z.B. 1v1 in FIFA',        isKloins: false },
+  { id: 'titel',     icon: '👑', label: 'Ehrentitel',     placeholder: 'z.B. König der Woche',    isKloins: false },
+  { id: 'haushalt',  icon: '🧹', label: 'Haushalt',       placeholder: 'z.B. Küche putzen 1 Monat',isKloins: false },
+];
+
+function parseStake(p) {
+  if (!p.stake_description) return { isKloins: true, icon: '💰', label: p.amount.toLocaleString('de-DE') + ' Kloins' };
+  const sep = p.stake_description.indexOf(':');
+  if (sep === -1) return { isKloins: false, icon: '📝', label: p.stake_description };
+  const typeId = p.stake_description.slice(0, sep);
+  const desc   = p.stake_description.slice(sep + 1);
+  const t = STAKE_TYPES.find(x => x.id === typeId);
+  return { isKloins: false, icon: t ? t.icon : '📝', label: desc };
+}
+
 let currentUser = null;
 let userKloins = 1000;
 let bet = null;
 let participants = [];
 let profiles = {};
 let joinSide = null;
+let joinStakeType = 'kloins';
 let resultSide = null;
 const betId = new URLSearchParams(location.search).get('id');
 
@@ -360,6 +378,12 @@ function fmtDate(d) {
   return new Date(d).toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 
+function fmtEndsAt(d) {
+  const date = new Date(d);
+  if (date.getFullYear() >= 2090) return 'Kein Limit';
+  return fmtDate(d);
+}
+
 function renderBetHeader() {
   const statusClass = { open:'status-open', closed:'status-closed', resolved:'status-resolved' }[bet.status];
   const statusLabel = { open:'Offen', closed:'Geschlossen', resolved:'Abgerechnet' }[bet.status];
@@ -370,29 +394,32 @@ function renderBetHeader() {
     </div>
     ${bet.description ? `<div class="bet-header-desc">${esc(bet.description)}</div>` : ''}
     <div class="bet-meta-row">
-      <div class="bet-meta-item">Endet: <strong>${fmtDate(bet.ends_at)}</strong></div>
+      <div class="bet-meta-item">Endet: <strong>${fmtEndsAt(bet.ends_at)}</strong></div>
       ${bet.resolved_at ? `<div class="bet-meta-item">Abgerechnet: <strong>${fmtDate(bet.resolved_at)}</strong></div>` : ''}
     </div>`;
 }
 
 function renderPot() {
-  const sideA = participants.filter(p => p.side === 'A').reduce((s,p) => s+p.amount, 0);
-  const sideB = participants.filter(p => p.side === 'B').reduce((s,p) => s+p.amount, 0);
-  const total = sideA + sideB;
+  // Only count Kloins stakes (stake_description is null = kloins)
+  const kloinsA = participants.filter(p => p.side === 'A' && !p.stake_description).reduce((s,p) => s+p.amount, 0);
+  const kloinsB = participants.filter(p => p.side === 'B' && !p.stake_description).reduce((s,p) => s+p.amount, 0);
+  const total = kloinsA + kloinsB;
+  const hasNonKloins = participants.some(p => p.stake_description);
   document.getElementById('potBar').innerHTML = `
     <div class="pot-total">
-      <div class="pot-total-label">Gesamtpot</div>
+      <div class="pot-total-label">Kloins-Pot</div>
       <div class="pot-total-val">💰 ${total.toLocaleString('de-DE')} Kloins</div>
+      ${hasNonKloins ? '<div style="font-size:0.72rem;color:var(--muted);margin-top:0.3rem">+ weitere Einsätze</div>' : ''}
     </div>
     <div class="pot-sides">
       <div class="pot-side">
         <div class="pot-side-label side-a-color">${esc(bet.side_a_label)}</div>
-        <div class="pot-side-val side-a-color">${sideA.toLocaleString('de-DE')}</div>
+        <div class="pot-side-val side-a-color">${kloinsA.toLocaleString('de-DE')}</div>
       </div>
       <div class="pot-side" style="color:var(--muted);align-self:center;font-weight:800;font-size:0.8rem;">VS</div>
       <div class="pot-side">
         <div class="pot-side-label side-b-color">${esc(bet.side_b_label)}</div>
-        <div class="pot-side-val side-b-color">${sideB.toLocaleString('de-DE')}</div>
+        <div class="pot-side-val side-b-color">${kloinsB.toLocaleString('de-DE')}</div>
       </div>
     </div>`;
 }
@@ -407,15 +434,16 @@ function renderSides() {
       const prof = profiles[p.user_id] || {};
       const isWinner = bet.status === 'resolved' && bet.winner_side === p.side;
       const isMe = p.user_id === currentUser.id;
+      const stake = parseStake(p);
       return `<div class="participant-row">
         <div class="participant-name">
           <span class="participant-avatar">${esc(prof.avatar || '🎮')}</span>
           <div>
-            <div class="participant-username ${isMe ? '' : ''}">${esc(prof.username || 'User')}${isMe ? ' <span style="color:var(--muted);font-size:0.7rem">(du)</span>' : ''}</div>
-            ${p.stake_description ? `<div class="participant-stake">${esc(p.stake_description)}</div>` : ''}
+            <div class="participant-username">${esc(prof.username || 'User')}${isMe ? ' <span style="color:var(--muted);font-size:0.7rem">(du)</span>' : ''}</div>
+            <div class="participant-stake">${stake.icon} ${esc(stake.label)}</div>
           </div>
         </div>
-        <div class="participant-amount ${colorClass} ${isWinner ? 'participant-winner' : ''}">${isWinner ? '🏆 ' : ''}${p.amount.toLocaleString('de-DE')}</div>
+        <div class="participant-amount ${stake.isKloins ? colorClass : ''} ${isWinner ? 'participant-winner' : ''}" style="${!stake.isKloins ? 'color:var(--muted);font-size:0.75rem' : ''}">${isWinner ? '🏆 ' : ''}${stake.isKloins ? p.amount.toLocaleString('de-DE') + ' Kloins' : ''}</div>
       </div>`;
     }).join('');
   }
@@ -445,7 +473,42 @@ function renderJoin() {
   joinCard.style.display = '';
   document.getElementById('joinBtnA').textContent = bet.side_a_label;
   document.getElementById('joinBtnB').textContent = bet.side_b_label;
-  document.getElementById('joinKloinsBalance').textContent = userKloins.toLocaleString('de-DE');
+
+  // Build stake type pills
+  const typesEl = document.getElementById('joinStakeTypes');
+  typesEl.innerHTML = STAKE_TYPES.map(t => `
+    <button onclick="selectJoinStake('${t.id}')" data-id="${t.id}"
+      style="display:flex;align-items:center;gap:0.3rem;padding:0.4rem 0.75rem;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--muted);font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.18s;white-space:nowrap${t.id==='kloins'?';background:rgba(245,255,0,0.1);border-color:rgba(245,255,0,0.4);color:var(--neon-yellow)':''}"
+      class="join-stake-btn">${t.icon} ${t.label}</button>`).join('');
+  renderJoinFields('kloins');
+}
+
+function selectJoinStake(id) {
+  joinStakeType = id;
+  document.querySelectorAll('.join-stake-btn').forEach(b => {
+    const active = b.dataset.id === id;
+    b.style.background = active ? 'rgba(245,255,0,0.1)' : 'rgba(255,255,255,0.03)';
+    b.style.borderColor = active ? 'rgba(245,255,0,0.4)' : 'var(--border)';
+    b.style.color = active ? 'var(--neon-yellow)' : 'var(--muted)';
+  });
+  renderJoinFields(id);
+}
+
+function renderJoinFields(id) {
+  const type = STAKE_TYPES.find(t => t.id === id);
+  const el = document.getElementById('joinStakeFields');
+  if (type.isKloins) {
+    el.innerHTML = `
+      <label style="display:block;font-size:0.75rem;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem">Betrag (Kloins) *</label>
+      <input type="text" id="joinAmount" placeholder="z.B. 100" maxlength="7" value="100"
+        style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:9px;padding:0.7rem 0.9rem;color:var(--text);font-size:0.95rem;font-family:inherit;margin-bottom:0.5rem">
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.8rem">Kontostand: <span style="color:var(--neon-yellow);font-weight:800">${userKloins.toLocaleString('de-DE')}</span> Kloins</div>`;
+  } else {
+    el.innerHTML = `
+      <label style="display:block;font-size:0.75rem;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem">${type.label} *</label>
+      <input type="text" id="joinStakeDesc" placeholder="${type.placeholder}" maxlength="150"
+        style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:9px;padding:0.7rem 0.9rem;color:var(--text);font-size:0.95rem;font-family:inherit;margin-bottom:0.8rem">`;
+  }
 }
 
 function selectJoinSide(side) {
@@ -456,16 +519,26 @@ function selectJoinSide(side) {
 
 async function joinBet() {
   if (!joinSide) return showAlert('Bitte eine Seite wählen.', 'error');
-  const amount = parseInt(document.getElementById('joinAmount').value.replace(/[^0-9]/g,''), 10);
-  if (!amount || amount <= 0) return showAlert('Bitte einen Einsatz eingeben.', 'error');
-  if (amount > userKloins) return showAlert(`Du hast nur ${userKloins.toLocaleString('de-DE')} Kloins.`, 'error');
 
-  const stakeDesc = document.getElementById('joinStakeDesc').value.trim();
+  const type = STAKE_TYPES.find(t => t.id === joinStakeType);
+  let amount = 1;
+  let stakeDesc = null;
+
+  if (type.isKloins) {
+    amount = parseInt((document.getElementById('joinAmount')?.value || '').replace(/[^0-9]/g,''), 10);
+    if (!amount || amount <= 0) return showAlert('Bitte einen Kloins-Betrag eingeben.', 'error');
+    if (amount > userKloins) return showAlert(`Du hast nur ${userKloins.toLocaleString('de-DE')} Kloins.`, 'error');
+  } else {
+    const descVal = document.getElementById('joinStakeDesc')?.value.trim();
+    if (!descVal) return showAlert(`Bitte deinen ${type.label}-Einsatz beschreiben.`, 'error');
+    stakeDesc = `${type.id}:${descVal}`;
+  }
+
   document.getElementById('btnJoin').disabled = true;
   document.getElementById('btnJoin').textContent = 'Einsteigen…';
 
   const { error } = await sb.from('bet_participants').insert({
-    bet_id: betId, user_id: currentUser.id, side: joinSide, amount, stake_description: stakeDesc || null
+    bet_id: betId, user_id: currentUser.id, side: joinSide, amount, stake_description: stakeDesc
   });
 
   if (error) {
@@ -474,7 +547,9 @@ async function joinBet() {
     return showAlert('Fehler: ' + error.message, 'error');
   }
 
-  await sb.from('profiles').update({ kloins: userKloins - amount }).eq('id', currentUser.id);
+  if (type.isKloins) {
+    await sb.from('profiles').update({ kloins: userKloins - amount }).eq('id', currentUser.id);
+  }
   showAlert('✓ Erfolgreich eingestiegen!', 'success');
   setTimeout(() => location.reload(), 900);
 }

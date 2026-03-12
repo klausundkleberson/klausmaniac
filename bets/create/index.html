@@ -79,30 +79,55 @@
   input:focus, textarea:focus { outline: none; border-color: var(--neon-blue); background: rgba(0,212,255,0.05); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
   textarea { resize: vertical; min-height: 80px; }
 
+  .input-optional-hint { font-size: 0.72rem; color: #333; margin-top: 0.4rem; }
+
+  /* Sides */
   .sides-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
 
-  .side-input-wrap { position: relative; }
-  .side-label-tag {
-    position: absolute; right: 0.7rem; top: 50%; transform: translateY(-50%);
-    font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
-    padding: 0.15rem 0.4rem; border-radius: 4px; pointer-events: none;
-  }
+  .side-field-wrap { position: relative; }
+  .side-label-tag { position: absolute; right: 0.7rem; top: 50%; transform: translateY(-50%); font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.15rem 0.4rem; border-radius: 4px; pointer-events: none; }
   .side-a-tag { background: rgba(0,212,255,0.15); color: var(--neon-blue); border: 1px solid rgba(0,212,255,0.3); }
   .side-b-tag { background: rgba(255,106,0,0.15); color: var(--neon-orange); border: 1px solid rgba(255,106,0,0.3); }
-  .side-input-wrap input { padding-right: 4.5rem; }
+  .side-field-wrap input { padding-right: 4.5rem; }
+
+  .random-btn {
+    margin-top: 0.45rem; width: 100%;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    color: var(--muted); font-family: inherit; font-size: 0.75rem; font-weight: 700;
+    border-radius: 7px; padding: 0.4rem 0.6rem; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+  }
+  .random-btn:hover { border-color: rgba(255,255,255,0.18); color: var(--text); background: rgba(255,255,255,0.06); }
+  .random-btn:active { transform: scale(0.97); }
 
   /* Side selector */
   .side-selector { display: flex; gap: 0.7rem; }
-  .side-btn {
-    flex: 1; padding: 0.8rem; border-radius: 12px; border: 2px solid transparent;
-    background: rgba(255,255,255,0.03); color: var(--muted); font-family: inherit;
-    font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center;
-  }
+  .side-btn { flex: 1; padding: 0.8rem; border-radius: 12px; border: 2px solid transparent; background: rgba(255,255,255,0.03); color: var(--muted); font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
   .side-btn-a.selected { background: rgba(0,212,255,0.1); border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 14px rgba(0,212,255,0.2); }
   .side-btn-b.selected { background: rgba(255,106,0,0.1); border-color: var(--neon-orange); color: var(--neon-orange); box-shadow: 0 0 14px rgba(255,106,0,0.2); }
   .side-btn:hover { background: rgba(255,255,255,0.05); }
 
-  .kloins-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  /* Stake type picker */
+  .stake-types {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.2rem;
+  }
+  .stake-type-btn {
+    display: flex; align-items: center; gap: 0.35rem;
+    padding: 0.45rem 0.8rem; border-radius: 999px;
+    border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+    color: var(--muted); font-family: inherit; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; transition: all 0.18s; white-space: nowrap;
+  }
+  .stake-type-btn:hover { border-color: rgba(255,255,255,0.18); color: var(--text); }
+  .stake-type-btn.active {
+    background: rgba(245,255,0,0.1); border-color: rgba(245,255,0,0.4);
+    color: var(--neon-yellow); box-shadow: 0 0 10px rgba(245,255,0,0.15);
+  }
+  .stake-type-icon { font-size: 1rem; }
+
+  .stake-fields { }
+  .stake-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; }
+  .stake-hint .kloins-val { color: var(--neon-yellow); font-weight: 800; }
 
   .alert { display: none; padding: 0.7rem 0.9rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; }
   .alert.error   { display: block; background: rgba(255,0,60,0.1); border: 1px solid rgba(255,0,60,0.3); color: #ff6b8a; }
@@ -111,9 +136,6 @@
   .btn-save { width: 100%; padding: 0.9rem; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 800; cursor: pointer; font-family: inherit; letter-spacing: 0.02em; text-transform: uppercase; background: var(--neon-yellow); color: #000; box-shadow: 0 0 20px rgba(245,255,0,0.3); transition: all 0.2s; margin-top: 0.5rem; }
   .btn-save:hover:not(:disabled) { box-shadow: 0 0 32px rgba(245,255,0,0.55); transform: translateY(-1px); }
   .btn-save:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-  .kloins-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; }
-  .kloins-hint .kloins-val { color: var(--neon-yellow); font-weight: 800; }
 
   /* Bottom Nav */
   .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; background: rgba(5,5,8,0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom)); display: none; grid-template-columns: repeat(4, 1fr); }
@@ -125,7 +147,7 @@
     .nav-links { display: none; }
     .bottom-nav { display: grid; }
     .page { padding-bottom: 5rem; }
-    .sides-grid, .kloins-row { grid-template-columns: 1fr; }
+    .sides-grid { grid-template-columns: 1fr; }
   }
 
   #loadingScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; font-size: 2rem; animation: pulse 1s ease-in-out infinite; }
@@ -168,6 +190,7 @@
 
     <div id="alertBox" class="alert"></div>
 
+    <!-- Wette -->
     <div class="card" style="animation-delay:0s">
       <div class="card-title">📋 Wette</div>
       <div class="form-group">
@@ -178,60 +201,61 @@
         <label>Beschreibung</label>
         <textarea id="fDesc" placeholder="Optionale Details zur Wette…" maxlength="500"></textarea>
       </div>
-      <div class="form-group">
-        <label>Enddatum &amp; Uhrzeit *</label>
+      <div class="form-group" style="margin:0">
+        <label>Enddatum &amp; Uhrzeit <span style="color:#333;font-size:0.7rem;font-weight:600;text-transform:none;letter-spacing:0">(optional)</span></label>
         <input type="datetime-local" id="fEndsAt">
+        <div class="input-optional-hint">Leer lassen = kein Zeitlimit</div>
       </div>
     </div>
 
+    <!-- Seiten -->
     <div class="card" style="animation-delay:0.05s">
       <div class="card-title">⚔️ Seiten</div>
       <div class="sides-grid">
-        <div class="form-group" style="margin:0">
+        <div>
           <label>Seite A (blau)</label>
-          <div class="side-input-wrap">
+          <div class="side-field-wrap">
             <input type="text" id="fSideA" placeholder="Team A" maxlength="40" value="Team A">
             <span class="side-label-tag side-a-tag">A</span>
           </div>
+          <button class="random-btn" onclick="randomName('A')">🎲 Zufallsname</button>
         </div>
-        <div class="form-group" style="margin:0">
+        <div>
           <label>Seite B (orange)</label>
-          <div class="side-input-wrap">
+          <div class="side-field-wrap">
             <input type="text" id="fSideB" placeholder="Team B" maxlength="40" value="Team B">
             <span class="side-label-tag side-b-tag">B</span>
           </div>
+          <button class="random-btn" onclick="randomName('B')">🎲 Zufallsname</button>
         </div>
       </div>
     </div>
 
+    <!-- Einsatz -->
     <div class="card" style="animation-delay:0.1s">
       <div class="card-title">🎯 Dein Einsatz</div>
+
       <div class="form-group">
         <label>Deine Seite *</label>
         <div class="side-selector">
-          <button class="side-btn side-btn-a" id="btnA" onclick="selectSide('A')">
+          <button class="side-btn side-btn-a" id="btnSideA" onclick="selectSide('A')">
             <span id="labelA">Team A</span>
           </button>
-          <button class="side-btn side-btn-b" id="btnB" onclick="selectSide('B')">
+          <button class="side-btn side-btn-b" id="btnSideB" onclick="selectSide('B')">
             <span id="labelB">Team B</span>
           </button>
         </div>
       </div>
-      <div class="kloins-row">
-        <div class="form-group" style="margin:0">
-          <label>Einsatz (Kloins) *</label>
-          <input type="text" id="fAmount" placeholder="z. B. 100" maxlength="7" oninput="updateKloinsPreview()" value="100">
-        </div>
-        <div class="form-group" style="margin:0">
-          <label>Einsatzbeschreibung</label>
-          <input type="text" id="fStakeDesc" placeholder="z. B. Ehrenwort!" maxlength="100">
-        </div>
+
+      <div class="form-group" style="margin-bottom:0.8rem">
+        <label>Einsatzart *</label>
+        <div class="stake-types" id="stakeTypes"></div>
       </div>
-      <div class="kloins-hint">Dein Kontostand: <span class="kloins-val" id="kloinsBalance">…</span> Kloins</div>
+
+      <div class="stake-fields" id="stakeFields"></div>
     </div>
 
     <button class="btn-save" id="btnSave" onclick="createBet()">Wette erstellen →</button>
-
   </div>
 
   <nav class="bottom-nav">
@@ -250,9 +274,103 @@ const SUPABASE_URL = 'https://tovruvmgqfsesyvlrxjr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ── Zufallsnamen ──────────────────────────────────────────────────────────────
+const RANDOM_NAMES = [
+  // FPS & Shooter
+  'No-Scope Nation', 'Headshot Club', 'CT-Side', 'T-Side', 'One-Shot Heroes',
+  'Spray & Pray', 'AWP Addicts', 'Flashbang FC',
+  // MOBA & Strategy
+  'Loot Goblins', 'Crit Masters', 'Glass Cannons', 'Feed Kings', 'Jungle Diff',
+  'Ward Monkeys', 'Baron Snatchers', 'Late Game Gods',
+  // RPG & Fantasy
+  'Shadow Realm', 'Void Walkers', 'Final Boss', 'World Eaters', 'Dungeon Lords',
+  'NachtEulen', 'MondWölfe', 'DonnerFäuste', 'FeuerfaustClan', 'SturmAdler',
+  // Trash Talk
+  'GG Easy', 'EZ Clap', 'Team Yolo', 'Full Tilt', 'Rage Quitters',
+  'AFK Warriors', 'Keyboard Warriors', 'Sweaty Nerds', 'Bronze Gods',
+  // Iconic
+  'Team Chaos', 'Team Order', 'Alliance', 'Die Horde', 'The Covenant',
+  'Respawn Kings', 'Prestige Club', 'Speed Demons', 'Solo Carries', 'The Last Patch',
+  // German Fun
+  'BlitzKrieger', 'TagAdler', 'EisenGilde', 'SilberZungen', 'GoldHände',
+  'Die Unsterblichen', 'Chaos Reiter', 'Neon Krieger', 'Pixel Piraten', 'Lag Lords'
+];
+
+let usedNames = new Set();
+
+function randomName(side) {
+  const input = document.getElementById('fSide' + side);
+  const available = RANDOM_NAMES.filter(n => !usedNames.has(n));
+  const pool = available.length > 0 ? available : RANDOM_NAMES;
+  const name = pool[Math.floor(Math.random() * pool.length)];
+  usedNames.delete(input.value);
+  usedNames.add(name);
+  input.value = name;
+  input.dispatchEvent(new Event('input'));
+  // Bounce animation
+  input.style.transition = 'transform 0.1s';
+  input.style.transform = 'scale(1.03)';
+  setTimeout(() => { input.style.transform = ''; }, 120);
+}
+
+// ── Stake Types ───────────────────────────────────────────────────────────────
+const STAKE_TYPES = [
+  { id: 'kloins',    icon: '💰', label: 'Kloins',         placeholder: 'Betrag (z.B. 200)',      hint: null,                        isKloins: true  },
+  { id: 'geld',      icon: '💵', label: 'Geld',           placeholder: 'z.B. 20€',               hint: 'Echter Geldbetrag',          isKloins: false },
+  { id: 'gegenstand',icon: '🎁', label: 'Gegenstand',     placeholder: 'z.B. Meine Sonnenbrille',hint: 'Ein physisches Objekt',      isKloins: false },
+  { id: 'aufgabe',   icon: '🏋️', label: 'Aufgabe',        placeholder: 'z.B. 100 Liegestütze',   hint: 'Sport oder Fitness Challenge',isKloins: false },
+  { id: 'getraenke', icon: '🍺', label: 'Getränke',       placeholder: 'z.B. 3 Bier ausgeben',   hint: 'Runde schmeißen',            isKloins: false },
+  { id: 'essen',     icon: '🍕', label: 'Essen',          placeholder: 'z.B. Pizza für alle',    hint: 'Mahlzeit oder Snack zahlen', isKloins: false },
+  { id: 'pflicht',   icon: '😳', label: 'Pflicht',        placeholder: 'z.B. Shirtlos zum Bäcker',hint: 'Peinliche oder lustige Aufgabe',isKloins: false },
+  { id: 'gaming',    icon: '🎮', label: 'Game-Challenge', placeholder: 'z.B. 1v1 in FIFA',       hint: 'Ingame Wette',               isKloins: false },
+  { id: 'titel',     icon: '👑', label: 'Ehrentitel',     placeholder: 'z.B. König der Woche',   hint: 'Spitzname oder Ehrenamt',    isKloins: false },
+  { id: 'haushalt',  icon: '🧹', label: 'Haushalt',       placeholder: 'z.B. Küche putzen für 1 Monat', hint: 'Hausarbeiten erledigen', isKloins: false },
+];
+
 let currentUser = null;
 let selectedSide = null;
+let selectedStakeType = 'kloins';
 let userKloins = 1000;
+
+function buildStakeTypes() {
+  const container = document.getElementById('stakeTypes');
+  container.innerHTML = STAKE_TYPES.map(t => `
+    <button class="stake-type-btn${t.id === 'kloins' ? ' active' : ''}"
+            onclick="selectStakeType('${t.id}')"
+            data-id="${t.id}">
+      <span class="stake-type-icon">${t.icon}</span>${t.label}
+    </button>`).join('');
+  renderStakeFields('kloins');
+}
+
+function selectStakeType(id) {
+  selectedStakeType = id;
+  document.querySelectorAll('.stake-type-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.id === id);
+  });
+  renderStakeFields(id);
+}
+
+function renderStakeFields(id) {
+  const type = STAKE_TYPES.find(t => t.id === id);
+  const fields = document.getElementById('stakeFields');
+  if (type.isKloins) {
+    fields.innerHTML = `
+      <div class="form-group" style="margin-bottom:0.5rem">
+        <label>Betrag (Kloins) *</label>
+        <input type="text" id="fAmount" placeholder="z.B. 200" maxlength="7" value="100">
+      </div>
+      <div class="stake-hint">Dein Kontostand: <span class="kloins-val" id="kloinsBalance">…</span> Kloins</div>`;
+    document.getElementById('kloinsBalance').textContent = userKloins.toLocaleString('de-DE');
+  } else {
+    fields.innerHTML = `
+      <div class="form-group" style="margin-bottom:0.5rem">
+        <label>${type.label} *</label>
+        <input type="text" id="fStakeDesc" placeholder="${type.placeholder}" maxlength="150">
+      </div>
+      ${type.hint ? `<div class="stake-hint">${type.hint}</div>` : ''}`;
+  }
+}
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
@@ -263,20 +381,16 @@ async function init() {
   if (profile) {
     if (profile.avatar) document.getElementById('navAvatar').textContent = profile.avatar;
     userKloins = profile.kloins ?? 1000;
-    document.getElementById('kloinsBalance').textContent = userKloins.toLocaleString('de-DE');
   }
 
-  // Default ends_at: now + 7 days
-  const d = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  d.setSeconds(0, 0);
-  document.getElementById('fEndsAt').value = d.toISOString().slice(0, 16);
+  buildStakeTypes();
 
-  // Sync side labels on input
+  // Sync side labels
   document.getElementById('fSideA').addEventListener('input', () => {
-    document.getElementById('labelA').textContent = document.getElementById('fSideA').value || 'Team A';
+    document.getElementById('labelA').textContent = document.getElementById('fSideA').value.trim() || 'Team A';
   });
   document.getElementById('fSideB').addEventListener('input', () => {
-    document.getElementById('labelB').textContent = document.getElementById('fSideB').value || 'Team B';
+    document.getElementById('labelB').textContent = document.getElementById('fSideB').value.trim() || 'Team B';
   });
 
   document.getElementById('loadingScreen').style.display = 'none';
@@ -285,54 +399,60 @@ async function init() {
 
 function selectSide(side) {
   selectedSide = side;
-  document.getElementById('btnA').classList.toggle('selected', side === 'A');
-  document.getElementById('btnB').classList.toggle('selected', side === 'B');
+  document.getElementById('btnSideA').classList.toggle('selected', side === 'A');
+  document.getElementById('btnSideB').classList.toggle('selected', side === 'B');
 }
 
-function updateKloinsPreview() {}
-
 async function createBet() {
-  const title = document.getElementById('fTitle').value.trim();
-  const desc  = document.getElementById('fDesc').value.trim();
-  const endsAt= document.getElementById('fEndsAt').value;
-  const sideA = document.getElementById('fSideA').value.trim() || 'Team A';
-  const sideB = document.getElementById('fSideB').value.trim() || 'Team B';
-  const amountRaw = parseInt(document.getElementById('fAmount').value.replace(/[^0-9]/g, ''), 10);
-  const stakeDesc = document.getElementById('fStakeDesc').value.trim();
+  const title  = document.getElementById('fTitle').value.trim();
+  const desc   = document.getElementById('fDesc').value.trim();
+  const endsAt = document.getElementById('fEndsAt').value;
+  const sideA  = document.getElementById('fSideA').value.trim() || 'Team A';
+  const sideB  = document.getElementById('fSideB').value.trim() || 'Team B';
 
-  if (!title)         return showAlert('Bitte einen Titel eingeben.', 'error');
-  if (!endsAt)        return showAlert('Bitte ein Enddatum wählen.', 'error');
-  if (new Date(endsAt) <= new Date()) return showAlert('Enddatum muss in der Zukunft liegen.', 'error');
-  if (!selectedSide)  return showAlert('Bitte deine Seite wählen.', 'error');
-  if (!amountRaw || amountRaw <= 0) return showAlert('Bitte einen gültigen Einsatz eingeben.', 'error');
-  if (amountRaw > userKloins) return showAlert(`Du hast nur ${userKloins.toLocaleString('de-DE')} Kloins.`, 'error');
+  if (!title)        return showAlert('Bitte einen Titel eingeben.', 'error');
+  if (endsAt && new Date(endsAt) <= new Date()) return showAlert('Enddatum muss in der Zukunft liegen.', 'error');
+  if (!selectedSide) return showAlert('Bitte deine Seite wählen.', 'error');
+
+  const type = STAKE_TYPES.find(t => t.id === selectedStakeType);
+  let amount = 1;
+  let stakeDesc = null;
+
+  if (type.isKloins) {
+    amount = parseInt((document.getElementById('fAmount')?.value || '').replace(/[^0-9]/g, ''), 10);
+    if (!amount || amount <= 0) return showAlert('Bitte einen gültigen Kloins-Betrag eingeben.', 'error');
+    if (amount > userKloins)    return showAlert(`Du hast nur ${userKloins.toLocaleString('de-DE')} Kloins.`, 'error');
+  } else {
+    const descVal = document.getElementById('fStakeDesc')?.value.trim();
+    if (!descVal) return showAlert(`Bitte deinen ${type.label}-Einsatz beschreiben.`, 'error');
+    stakeDesc = `${type.id}:${descVal}`;
+  }
 
   setBtnLoading(true);
 
-  // Create bet
+  // ends_at: optional — use far future if empty
+  const endsAtISO = endsAt ? new Date(endsAt).toISOString() : '2099-12-31T23:59:59Z';
+
   const { data: bet, error: betErr } = await sb.from('bets').insert({
     title, description: desc || null,
     created_by: currentUser.id,
     side_a_label: sideA, side_b_label: sideB,
-    ends_at: new Date(endsAt).toISOString(),
+    ends_at: endsAtISO,
     status: 'open'
   }).select().single();
 
   if (betErr) { setBtnLoading(false); return showAlert('Fehler: ' + betErr.message, 'error'); }
 
-  // Join bet
   const { error: partErr } = await sb.from('bet_participants').insert({
-    bet_id: bet.id,
-    user_id: currentUser.id,
-    side: selectedSide,
-    amount: amountRaw,
-    stake_description: stakeDesc || null
+    bet_id: bet.id, user_id: currentUser.id,
+    side: selectedSide, amount, stake_description: stakeDesc
   });
 
-  if (partErr) { setBtnLoading(false); return showAlert('Wette erstellt, aber Einsatz fehlgeschlagen: ' + partErr.message, 'error'); }
+  if (partErr) { setBtnLoading(false); return showAlert('Wette erstellt, Einsatz fehlgeschlagen: ' + partErr.message, 'error'); }
 
-  // Deduct kloins
-  await sb.from('profiles').update({ kloins: userKloins - amountRaw }).eq('id', currentUser.id);
+  if (type.isKloins) {
+    await sb.from('profiles').update({ kloins: userKloins - amount }).eq('id', currentUser.id);
+  }
 
   setBtnLoading(false);
   showAlert('✓ Wette erstellt!', 'success');

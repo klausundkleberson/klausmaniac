@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KlausManiac</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050508;
+    --neon-yellow: #f5ff00;
+    --neon-blue:   #00d4ff;
+    --neon-orange: #ff6a00;
+    --neon-green:  #00ff88;
+    --neon-red:    #ff003c;
+    --card: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f0f0;
+    --muted: #555;
+    --input-bg: rgba(255,255,255,0.04);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Neon Glow Blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    opacity: 0.55;
+  }
+  .blob-1 { width: 400px; height: 400px; top: -10%; left: -10%; background: var(--neon-blue);   animation: drift1 9s ease-in-out infinite alternate; }
+  .blob-2 { width: 300px; height: 300px; bottom: -5%; right: -5%; background: var(--neon-orange); animation: drift2 11s ease-in-out infinite alternate; }
+  .blob-3 { width: 200px; height: 200px; top: 50%; left: 60%; background: var(--neon-green);   animation: drift1 7s ease-in-out infinite alternate-reverse; }
+
+  @keyframes drift1 { from { transform: translate(0,0);      } to { transform: translate(30px, 40px); } }
+  @keyframes drift2 { from { transform: translate(0,0);      } to { transform: translate(-40px,-30px); } }
+
+  /* Grid */
+  .grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 36px 36px;
+    pointer-events: none;
+  }
+
+  /* Card */
+  .card {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem 2.2rem;
+    backdrop-filter: blur(24px);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.04) inset,
+      0 0 60px rgba(0,212,255,0.08),
+      0 40px 80px rgba(0,0,0,0.7);
+    animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(28px) scale(0.96); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 2rem; }
+
+  .logo-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    background: var(--bg);
+    border: 2px solid var(--neon-yellow);
+    border-radius: 16px;
+    font-size: 1.6rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 0 18px rgba(245,255,0,0.4), 0 0 40px rgba(245,255,0,0.15);
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 18px rgba(245,255,0,0.4), 0 0 40px rgba(245,255,0,0.15); }
+    50%       { box-shadow: 0 0 28px rgba(245,255,0,0.7), 0 0 60px rgba(245,255,0,0.25); }
+  }
+
+  .header h1 {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.04em;
+    margin-bottom: 0.35rem;
+  }
+
+  .header h1 .neon {
+    color: var(--neon-yellow);
+    text-shadow: 0 0 12px rgba(245,255,0,0.6);
+  }
+
+  .header p { font-size: 0.85rem; color: var(--muted); }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 3px;
+    margin-bottom: 1.8rem;
+    gap: 3px;
+  }
+
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 0.52rem;
+    border-radius: 8px;
+    font-size: 0.87rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.22s;
+    user-select: none;
+    letter-spacing: 0.01em;
+  }
+
+  .tab.active {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 14px rgba(0,212,255,0.5);
+  }
+
+  /* Alert */
+  .alert {
+    display: none;
+    padding: 0.7rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .alert.error   { display: block; background: rgba(255,0,60,0.1);   border: 1px solid rgba(255,0,60,0.3);   color: #ff6b8a; }
+  .alert.success { display: block; background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25); color: #00ff88; }
+
+  /* Form */
+  .form-group { margin-bottom: 1rem; }
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
+  }
+
+  .input-wrap { position: relative; }
+
+  .input-icon {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.95rem;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0.72rem 0.9rem 0.72rem 2.5rem;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+
+  input::placeholder { color: #2a2a2a; }
+
+  input:focus {
+    outline: none;
+    border-color: var(--neon-blue);
+    background: rgba(0,212,255,0.05);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.12), 0 0 12px rgba(0,212,255,0.1);
+  }
+
+  /* Button */
+  .btn {
+    width: 100%;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 9px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    margin-top: 0.75rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .btn-primary {
+    background: var(--neon-green);
+    color: #000;
+    box-shadow: 0 0 20px rgba(0,255,136,0.35), 0 4px 16px rgba(0,0,0,0.3);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 0 32px rgba(0,255,136,0.6), 0 4px 24px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active  { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid #222;
+    color: #444;
+    margin-top: 0.5rem;
+    text-transform: none;
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  .btn-ghost:hover { border-color: var(--neon-red); color: var(--neon-red); box-shadow: 0 0 10px rgba(255,0,60,0.2); }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 1.1rem 0;
+    color: #2a2a2a;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Google Button */
+  .btn-google {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.8rem;
+    border: 1px solid #222;
+    border-radius: 9px;
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    font-size: 0.92rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .btn-google:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: #444;
+    box-shadow: 0 0 16px rgba(255,255,255,0.05);
+    transform: translateY(-1px);
+  }
+  .btn-google:active { transform: translateY(0); }
+
+  .google-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+  /* Dashboard */
+  #dashboard { display: none; }
+
+  .dash-header { text-align: center; margin-bottom: 1.8rem; }
+
+  .avatar {
+    width: 70px;
+    height: 70px;
+    background: var(--bg);
+    border: 2px solid var(--neon-orange);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 20px rgba(255,106,0,0.5), 0 0 50px rgba(255,106,0,0.2);
+    animation: pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes pop {
+    from { transform: scale(0.4); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  .dash-header h2 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .dash-header p { font-size: 0.82rem; color: var(--muted); margin-top: 0.3rem; word-break: break-all; }
+
+  .info-box {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.7rem;
+    font-size: 0.85rem;
+    color: #444;
+    line-height: 1.6;
+  }
+
+  .info-box strong {
+    color: var(--text);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(0,255,136,0.12);
+    border: 1px solid rgba(0,255,136,0.3);
+    color: var(--neon-green);
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 8px rgba(0,255,136,0.5);
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+<div class="grid"></div>
+
+<div class="card">
+
+  <!-- AUTH -->
+  <div id="authArea">
+    <div class="header">
+      <div class="logo-wrap">⚡</div>
+      <h1>Klaus<span class="neon">Maniac</span></h1>
+      <p>Dein Space. Deine Projekte. Let's go.</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" id="tabLogin" onclick="switchTab('login')">Anmelden</div>
+      <div class="tab" id="tabRegister" onclick="switchTab('register')">Registrieren</div>
+    </div>
+
+    <div id="alertBox" class="alert"></div>
+
+    <!-- LOGIN -->
+    <div id="formLogin">
+      <div class="form-group">
+        <label>E-Mail</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="loginEmail" placeholder="deine@email.de" autocomplete="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Passwort</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔑</span>
+          <input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btnLogin" onclick="login()">Anmelden →</button>
+      <div class="divider">oder</div>
+      <button class="btn-google" onclick="loginWithGoogle()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Mit Google anmelden
+      </button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="formRegister" style="display:none">
+      <div class="form-group">
+        <label>E-Mail</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="regEmail" placeholder="deine@email.de" autocomplete="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Passwort</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔑</span>
+          <input type="password" id="regPassword" placeholder="Min. 6 Zeichen" onkeydown="if(event.key==='Enter') register()">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btnRegister" onclick="register()">Account erstellen →</button>
+      <div class="divider">oder</div>
+      <button class="btn-google" onclick="loginWithGoogle()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Mit Google registrieren
+      </button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <div class="dash-header">
+      <div class="avatar">🤙</div>
+      <h2>Was geht, Brudi!</h2>
+      <p id="userEmail"></p>
+    </div>
+
+    <div class="info-box">
+      <strong>Eingeloggt <span class="badge">✓ Live</span></strong>
+      Supabase hat dich authentifiziert. Session bleibt auch nach Reload erhalten.
+    </div>
+
+    <div class="info-box">
+      <strong>🚀 Nächster Step</strong>
+      Datenbank-Tabelle anlegen und erste Daten speichern. Tippspiel incoming.
+    </div>
+
+    <button class="btn btn-ghost" onclick="logout()">Abmelden</button>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+
+const SUPABASE_URL = 'https://tovruvmgqfsesyvlrxjr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (session) showDashboard(session.user);
+});
+
+sb.auth.onAuthStateChange((_event, session) => {
+  if (session) showDashboard(session.user);
+  else showAuth();
+});
+
+function switchTab(tab) {
+  clearAlert();
+  document.getElementById('formLogin').style.display    = tab === 'login'    ? '' : 'none';
+  document.getElementById('formRegister').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('tabLogin').classList.toggle('active',    tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+}
+
+async function login() {
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { showAlert('E-Mail und Passwort eingeben.', 'error'); return; }
+  setLoading('btnLogin', true);
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  setLoading('btnLogin', false);
+  if (error) showAlert(translateError(error.message), 'error');
+}
+
+async function register() {
+  const email    = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  if (!email || !password) { showAlert('E-Mail und Passwort eingeben.', 'error'); return; }
+  if (password.length < 6)  { showAlert('Passwort muss mind. 6 Zeichen haben.', 'error'); return; }
+  setLoading('btnRegister', true);
+  const { error } = await sb.auth.signUp({ email, password });
+  setLoading('btnRegister', false);
+  if (error) showAlert(translateError(error.message), 'error');
+  else showAlert('✓ Check dein Postfach — Bestätigungsmail ist raus!', 'success');
+}
+
+async function loginWithGoogle() {
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href }
+  });
+}
+
+async function logout() {
+  await sb.auth.signOut();
+}
+
+function showDashboard(user) {
+  document.getElementById('authArea').style.display  = 'none';
+  document.getElementById('dashboard').style.display = '';
+  document.getElementById('userEmail').textContent   = user.email;
+}
+
+function showAuth() {
+  document.getElementById('authArea').style.display  = '';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+function showAlert(msg, type) {
+  const el = document.getElementById('alertBox');
+  el.textContent = msg;
+  el.className = 'alert ' + type;
+}
+
+function clearAlert() {
+  document.getElementById('alertBox').className = 'alert';
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Lädt…' : (btnId === 'btnLogin' ? 'Anmelden →' : 'Account erstellen →');
+}
+
+function translateError(msg) {
+  if (msg.includes('Invalid login credentials')) return 'E-Mail oder Passwort falsch.';
+  if (msg.includes('Email not confirmed'))        return 'Bestätige erst deine E-Mail-Adresse.';
+  if (msg.includes('User already registered'))    return 'Diese E-Mail ist bereits registriert.';
+  if (msg.includes('Password should be'))         return 'Passwort muss mind. 6 Zeichen haben.';
+  return msg;
+}
+</script>
+</body>
+</html>

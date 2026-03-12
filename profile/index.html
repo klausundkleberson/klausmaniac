@@ -181,6 +181,49 @@
   .btn-save:hover:not(:disabled) { box-shadow: 0 0 32px rgba(0,255,136,0.55); transform: translateY(-1px); }
   .btn-save:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
+  /* ── Bottom Nav (Mobile) ── */
+  .bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 50;
+    background: rgba(5,5,8,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));
+    display: none;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.4rem;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+  }
+  .bottom-nav-item .bn-icon { font-size: 1.3rem; }
+  .bottom-nav-item.active { color: var(--neon-yellow); }
+  .bottom-nav-item.active .bn-icon { filter: drop-shadow(0 0 6px rgba(245,255,0,0.5)); }
+
+  /* Navbar links verstecken auf Mobile, Bottom Nav zeigen */
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .bottom-nav { display: grid; }
+    .page { padding-bottom: 5rem; }
+  }
+
   #loadingScreen {
     position: fixed; inset: 0; background: var(--bg);
     display: flex; align-items: center; justify-content: center;
@@ -254,6 +297,15 @@
     <button class="btn-save" id="btnSave" onclick="saveProfile()">Profil speichern →</button>
 
   </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a class="bottom-nav-item" href="../dashboard/"><span class="bn-icon">🏠</span>Home</a>
+    <a class="bottom-nav-item active" href="../profile/"><span class="bn-icon">👤</span>Profil</a>
+    <span class="bottom-nav-item"><span class="bn-icon">🏆</span>Tipps</span>
+    <span class="bottom-nav-item"><span class="bn-icon">🎮</span>Scores</span>
+  </nav>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

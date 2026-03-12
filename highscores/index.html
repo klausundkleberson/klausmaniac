@@ -107,7 +107,9 @@
   .rank-3 { color: var(--neon-orange); }
 
   .user-cell { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
-  .user-avatar { font-size: 1.2rem; flex-shrink: 0; }
+  .user-avatar { font-size: 1.2rem; flex-shrink: 0; width: 1.6rem; height: 1.6rem; display: flex; align-items: center; justify-content: center; }
+  .user-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  .podium-avatar img { width: 2.5rem; height: 2.5rem; border-radius: 50%; object-fit: cover; }
   .user-name { font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .user-me { font-size: 0.65rem; color: var(--muted); margin-left: 0.3rem; }
 
@@ -208,6 +210,7 @@ const SUPABASE_KEY = 'sb_publishable_0Ld58xAOFjwoMM42eL2Q6Q_4FmXUJda';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function avatarHtml(p, size) { return p?.avatar_url ? `<img src="${esc(p.avatar_url)}" style="width:${size};height:${size};border-radius:50%;object-fit:cover">` : esc(p?.avatar || '🎮'); }
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
@@ -218,7 +221,7 @@ async function init() {
 
   // Load all profiles with stats, sorted by wins then kloins
   const { data: profiles, error } = await sb.from('profiles')
-    .select('id, username, avatar, kloins, bets_won, bets_played')
+    .select('id, username, avatar, avatar_url, kloins, bets_won, bets_played')
     .not('username', 'is', null)
     .order('bets_won', { ascending: false })
     .order('kloins', { ascending: false });
@@ -259,7 +262,7 @@ function renderPodium(profiles, myId) {
     const isMe = p.id === myId;
     return `
       <div class="podium-item ${cls[rank]}">
-        <span class="podium-avatar">${esc(p.avatar || '🎮')}</span>
+        <span class="podium-avatar">${avatarHtml(p, '2.5rem')}</span>
         <div class="podium-name${isMe ? '" style="color:var(--neon-yellow)' : ''}">${esc(p.username || 'User')}</div>
         <div class="podium-kloins">${(p.kloins || 0).toLocaleString('de-DE')} Kloins</div>
         <div class="podium-block">
@@ -279,7 +282,7 @@ function renderTable(profiles, myId) {
       <div class="table-row${isMe ? ' is-me' : ''}">
         <div class="rank-cell ${rankClass}">${rank}</div>
         <div class="user-cell">
-          <span class="user-avatar">${esc(p.avatar || '🎮')}</span>
+          <span class="user-avatar">${avatarHtml(p, '1.6rem')}</span>
           <span class="user-name">${esc(p.username || 'User')}${isMe ? '<span class="user-me">(du)</span>' : ''}</span>
         </div>
         <div class="col-num col-won col-right">${p.bets_won || 0}</div>

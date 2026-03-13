@@ -257,6 +257,15 @@
 
   #loadingScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; font-size: 2rem; animation: pulse 1s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Testgegner-Card */
+  .bot-card { background: rgba(245,255,0,0.03); border: 1px dashed rgba(245,255,0,0.2); border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.2s cubic-bezier(0.16,1,0.3,1) both; }
+  .bot-card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(245,255,0,0.5); }
+  .bot-input-row { display: flex; gap: 0.6rem; align-items: flex-end; }
+  .bot-input-row input { flex: 1; }
+  .btn-bot { padding: 0.75rem 1.2rem; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 800; cursor: pointer; font-family: inherit; background: rgba(245,255,0,0.12); color: var(--neon-yellow); border: 1px solid rgba(245,255,0,0.25); transition: all 0.2s; white-space: nowrap; }
+  .btn-bot:hover:not(:disabled) { background: rgba(245,255,0,0.2); }
+  .btn-bot:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -317,6 +326,25 @@
         <div id="joinStakeFields"></div>
       </div>
       <button class="btn-join" id="btnJoin" onclick="joinBet()">Jetzt einsteigen →</button>
+    </div>
+
+    <!-- Testgegner (nur für Ersteller sichtbar, nur wenn offen) -->
+    <div class="bot-card" id="botCard" style="display:none">
+      <div class="bot-card-header">🤖 Testgegner hinzufügen</div>
+      <div class="bot-input-row">
+        <div style="flex:1">
+          <label>Seite</label>
+          <select id="botSide" style="width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:9px;padding:0.7rem 0.9rem;color:var(--text);font-size:0.9rem;font-family:inherit;outline:none">
+            <option value="A" id="botOptA">Team A</option>
+            <option value="B" id="botOptB">Team B</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label>Kloins</label>
+          <input type="text" id="botAmount" value="100" maxlength="7" placeholder="100">
+        </div>
+        <button class="btn-bot" id="btnBot" onclick="addBot()">🤖 Einbuchen</button>
+      </div>
     </div>
 
     <!-- Ergebnis eintragen (open/closed) -->
@@ -453,6 +481,7 @@ async function init() {
   renderPot();
   renderSides();
   renderJoin();
+  renderBotCard();
   renderResultSection();
   await renderHistory();
 
@@ -676,6 +705,47 @@ function renderSides() {
       </div>
       ${participantRows(partsB, 'amount-b', wonB)}
     </div>`;
+}
+
+const BOT_ID = '00000000-0000-0000-0000-000000000b07';
+
+function renderBotCard() {
+  const isCreator = currentUser.id === bet.created_by;
+  const botAlreadyIn = participants.some(p => p.user_id === BOT_ID);
+  const card = document.getElementById('botCard');
+  if (!isCreator || bet.status !== 'open' || botAlreadyIn) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = '';
+
+  // Vorschlag: Bot auf Gegenseite des Erstellers setzen
+  const myEntry = participants.find(p => p.user_id === currentUser.id);
+  const oppSide = myEntry?.side === 'A' ? 'B' : 'A';
+  document.getElementById('botSide').value = oppSide;
+  document.getElementById('botOptA').textContent = bet.side_a_label;
+  document.getElementById('botOptB').textContent = bet.side_b_label;
+}
+
+async function addBot() {
+  const side = document.getElementById('botSide').value;
+  const amount = parseInt(document.getElementById('botAmount').value.replace(/[^0-9]/g,''), 10);
+  if (!amount || amount <= 0) return showAlert('Bitte einen Betrag eingeben.', 'error');
+
+  document.getElementById('btnBot').disabled = true;
+  document.getElementById('btnBot').textContent = 'Einbuche…';
+
+  const { error } = await sb.rpc('add_test_participant', {
+    p_bet_id: betId, p_side: side, p_amount: amount
+  });
+
+  if (error) {
+    document.getElementById('btnBot').disabled = false;
+    document.getElementById('btnBot').textContent = '🤖 Einbuchen';
+    return showAlert('Fehler: ' + error.message, 'error');
+  }
+  showAlert('✓ KlausBot eingebucht!', 'success');
+  setTimeout(() => location.reload(), 900);
 }
 
 function renderJoin() {

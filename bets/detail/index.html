@@ -110,6 +110,7 @@
   .winner-hero-gain-zero { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
   .winner-hero-stake { font-size: 0.82rem; color: #888; }
   .winner-hero-footer { font-size: 0.75rem; color: var(--muted); }
+  .winner-hero-spruch { font-size: 1rem; font-weight: 700; font-style: italic; color: var(--neon-yellow); text-shadow: 0 0 14px rgba(245,255,0,0.4); text-align: center; margin-bottom: 0.8rem; padding: 0 0.5rem; }
   .winner-hero-team { font-weight: 600; }
 
   /* Draw hero */
@@ -472,7 +473,7 @@ async function init() {
 
   const userIds = [...new Set(participants.map(p => p.user_id))];
   if (userIds.length > 0) {
-    const { data: profs } = await sb.from('profiles').select('id, username, avatar, avatar_url').in('id', userIds);
+    const { data: profs } = await sb.from('profiles').select('id, username, avatar, avatar_url, siegesspruch_1, siegesspruch_2, siegesspruch_3, siegesspruch_4, siegesspruch_5').in('id', userIds);
     (profs || []).forEach(p => { profiles[p.id] = p; });
   }
 
@@ -595,9 +596,19 @@ function renderWinnerHero() {
     </div>`;
   }).join('');
 
+  // Pick a random Siegesspruch from one of the winners
+  const winnerSprueche = winners.flatMap(p => {
+    const prof = profiles[p.user_id] || {};
+    return [prof.siegesspruch_1, prof.siegesspruch_2, prof.siegesspruch_3, prof.siegesspruch_4, prof.siegesspruch_5].filter(Boolean);
+  });
+  const randomSpruch = winnerSprueche.length > 0
+    ? winnerSprueche[Math.floor(Math.random() * winnerSprueche.length)]
+    : null;
+
   el.innerHTML = `<div class="winner-hero">
     <div class="winner-hero-eyebrow">🏆 Gewonnen</div>
     <div class="winner-hero-users">${usersHtml || '<div style="color:var(--muted);font-size:0.85rem">–</div>'}</div>
+    ${randomSpruch ? `<div class="winner-hero-spruch">"${esc(randomSpruch)}"</div>` : ''}
     <div class="winner-hero-footer">
       <span class="winner-hero-team">${esc(teamLabel)}</span>
       ${bet.result_description ? ` · <em style="color:var(--muted)">"${esc(bet.result_description)}"</em>` : ''}

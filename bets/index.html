@@ -239,7 +239,10 @@ async function loadBets(status) {
   const list = document.getElementById('betsList');
   list.innerHTML = '<div class="empty-state"><span class="empty-icon" style="animation:pulse 1s infinite">⚡</span><p>Lädt…</p></div>';
 
-  const { data: bets, error } = await sb.from('bets').select('*, bet_participants(user_id, side, amount, stake_description, profiles(username, avatar, avatar_url))').eq('status', status).order('created_at', { ascending: false });
+  const { data: bets, error } = await sb.from('bets')
+    .select('*, bet_participants(user_id, side, amount, stake_description)')
+    .eq('status', status)
+    .order('created_at', { ascending: false });
 
   if (error || !bets || bets.length === 0) {
     const labels = { open: 'Noch keine offenen Wetten', closed: 'Keine geschlossenen Wetten', resolved: 'Noch keine abgerechneten Wetten' };
@@ -247,8 +250,16 @@ async function loadBets(status) {
     return;
   }
 
+  // Load profiles separately (nested join via PostgREST is unreliable with RLS)
+  const allUserIds = [...new Set(bets.flatMap(b => (b.bet_participants || []).map(p => p.user_id)))];
+  const profileMap = {};
+  if (allUserIds.length > 0) {
+    const { data: profs } = await sb.from('profiles').select('id, username, avatar, avatar_url').in('id', allUserIds);
+    (profs || []).forEach(p => { profileMap[p.id] = p; });
+  }
+
   list.innerHTML = bets.map(bet => {
-    const parts = bet.bet_participants || [];
+    const parts = (bet.bet_participants || []).map(p => ({ ...p, profiles: profileMap[p.user_id] || {} }));
     const pot = parts.filter(p => !p.stake_description).reduce((s, p) => s + p.amount, 0);
     const endsAt = new Date(bet.ends_at);
     const dateStr = endsAt.getFullYear() >= 2090 ? 'Kein Limit' : endsAt.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });

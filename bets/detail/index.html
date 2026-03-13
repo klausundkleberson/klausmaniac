@@ -525,7 +525,11 @@ function renderWinnerHero() {
 
   const payouts = calcPayouts();
   const winners = participants.filter(p => p.side === bet.winner_side);
+  const losers  = participants.filter(p => p.side !== bet.winner_side);
   const teamLabel = bet.winner_side === 'A' ? bet.side_a_label : bet.side_b_label;
+
+  // Loser non-Kloins stakes (each winner gets all of these)
+  const loserNonKloinsStakes = losers.filter(p => p.stake_description).map(p => parseStake(p));
 
   const usersHtml = winners.map(p => {
     const prof = profiles[p.user_id] || {};
@@ -545,7 +549,14 @@ function renderWinnerHero() {
         gainHtml = `<div class="winner-hero-gain-zero">Einsatz zurück</div>`;
       }
     } else {
-      gainHtml = `<div class="winner-hero-stake">${stake.icon} ${esc(stake.label)}</div>`;
+      // Show what the losers wagered — each winner collects all loser stakes
+      if (loserNonKloinsStakes.length > 0) {
+        gainHtml = loserNonKloinsStakes.map(s =>
+          `<div class="winner-hero-stake">${s.icon} ${esc(s.label)}</div>`
+        ).join('');
+      } else {
+        gainHtml = `<div class="winner-hero-stake">${stake.icon} ${esc(stake.label)}</div>`;
+      }
     }
 
     return `<div class="winner-hero-user">
@@ -600,8 +611,16 @@ function renderSides() {
   const wonA = isResolved && bet.winner_side === 'A';
   const wonB = isResolved && bet.winner_side === 'B';
 
-  function participantRows(parts, amountClass) {
+  // Non-Kloins stakes per side (losers' stakes shown to winners)
+  const loserStakesA = partsA.filter(p => p.stake_description).map(p => parseStake(p));
+  const loserStakesB = partsB.filter(p => p.stake_description).map(p => parseStake(p));
+
+  function participantRows(parts, amountClass, isWinningSide) {
     if (parts.length === 0) return '<div class="no-participants">Noch niemand</div>';
+    // Loser non-Kloins stakes = what the other side wagered
+    const opponentNonKloins = isWinningSide === true
+      ? (bet.winner_side === 'A' ? loserStakesB : loserStakesA)
+      : [];
     return parts.map(p => {
       const prof = profiles[p.user_id] || {};
       const isMe = p.user_id === currentUser.id;
@@ -617,6 +636,11 @@ function renderSides() {
         if (isResolved && pd && pd.profit > 0) {
           rightHtml += `<div class="participant-payout">+${pd.profit.toLocaleString('de-DE')}</div>`;
         }
+      } else if (isResolved && isWinningSide && opponentNonKloins.length > 0) {
+        // Show what this winner earns: all opposing non-Kloins stakes
+        rightHtml = opponentNonKloins.map(s =>
+          `<div class="participant-payout">${s.icon} ${esc(s.label)}</div>`
+        ).join('');
       }
 
       return `<div class="participant-row">
@@ -643,14 +667,14 @@ function renderSides() {
         <div class="${dotClassA}" style="${wonA ? 'background:var(--neon-green);box-shadow:0 0 8px rgba(0,255,136,0.5)' : ''}"></div>
         <div class="side-card-label">${esc(bet.side_a_label)}</div>
       </div>
-      ${participantRows(partsA, 'amount-a')}
+      ${participantRows(partsA, 'amount-a', wonA)}
     </div>
     <div class="${cardClassB}">
       <div class="side-card-header">
         <div class="${dotClassB}" style="${wonB ? 'background:var(--neon-green);box-shadow:0 0 8px rgba(0,255,136,0.5)' : ''}"></div>
         <div class="side-card-label">${esc(bet.side_b_label)}</div>
       </div>
-      ${participantRows(partsB, 'amount-b')}
+      ${participantRows(partsB, 'amount-b', wonB)}
     </div>`;
 }
 

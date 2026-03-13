@@ -60,17 +60,68 @@
   .back-link:hover { color: var(--text); }
 
   /* Bet header */
-  .bet-header { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
-  .bet-header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+  .bet-header { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem 1.8rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+  .bet-header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
   .bet-header-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
   .bet-header-desc { font-size: 0.88rem; color: var(--muted); margin-top: 0.5rem; line-height: 1.5; }
-  .bet-meta-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 1rem; font-size: 0.8rem; color: var(--muted); }
+  .bet-meta-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.8rem; font-size: 0.8rem; color: var(--muted); }
   .bet-meta-item strong { color: var(--text); }
 
   .status-badge { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.2rem 0.55rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
   .status-open     { background: rgba(0,255,136,0.12); color: var(--neon-green); border: 1px solid rgba(0,255,136,0.3); }
   .status-closed   { background: rgba(255,255,255,0.05); color: #444; border: 1px solid #1a1a1a; }
   .status-resolved { background: rgba(245,255,0,0.1); color: var(--neon-yellow); border: 1px solid rgba(245,255,0,0.3); }
+
+  /* ── Winner Hero ── */
+  .winner-hero {
+    position: relative; overflow: hidden;
+    background: linear-gradient(160deg, rgba(0,255,136,0.07) 0%, rgba(245,255,0,0.04) 100%);
+    border: 1px solid rgba(0,255,136,0.25);
+    border-radius: 20px; padding: 2rem 1.5rem 1.6rem;
+    margin-bottom: 1.2rem; text-align: center;
+    animation: fadeUp 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .winner-hero::before {
+    content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+    width: 300px; height: 200px;
+    background: radial-gradient(ellipse, rgba(0,255,136,0.14) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .winner-hero-eyebrow {
+    font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.14em; color: var(--neon-green);
+    text-shadow: 0 0 10px rgba(0,255,136,0.5);
+    margin-bottom: 1.4rem;
+  }
+  .winner-hero-users { display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.2rem; }
+  .winner-hero-user { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
+  .winner-hero-avatar {
+    width: 68px; height: 68px; border-radius: 50%;
+    border: 2.5px solid var(--neon-green);
+    box-shadow: 0 0 22px rgba(0,255,136,0.4), 0 0 60px rgba(0,255,136,0.1);
+    background: var(--bg); display: flex; align-items: center;
+    justify-content: center; font-size: 2rem; overflow: hidden;
+  }
+  .winner-hero-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .winner-hero-name { font-size: 1rem; font-weight: 800; letter-spacing: -0.01em; }
+  .winner-hero-me { color: var(--neon-green); font-size: 0.68rem; font-weight: 700; }
+  .winner-hero-gain-label { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-top: 0.1rem; }
+  .winner-hero-gain { font-size: 1.4rem; font-weight: 800; color: var(--neon-yellow); text-shadow: 0 0 18px rgba(245,255,0,0.5); letter-spacing: -0.02em; }
+  .winner-hero-gain-zero { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+  .winner-hero-stake { font-size: 0.82rem; color: #888; }
+  .winner-hero-footer { font-size: 0.75rem; color: var(--muted); }
+  .winner-hero-team { font-weight: 600; }
+
+  /* Draw hero */
+  .draw-hero {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 1.5rem; margin-bottom: 1.2rem;
+    text-align: center; animation: fadeUp 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .draw-hero-icon { font-size: 2.2rem; margin-bottom: 0.4rem; }
+  .draw-hero-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  .draw-hero-text { font-size: 1rem; font-weight: 800; margin-top: 0.3rem; }
+  .draw-hero-desc { font-size: 0.82rem; color: var(--muted); margin-top: 0.4rem; font-style: italic; }
 
   /* Pot */
   .pot-bar { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem 1.5rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) both; display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap; }
@@ -87,9 +138,11 @@
   /* Sides */
   .sides-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
 
-  .side-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.3rem; }
+  .side-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.3rem; transition: opacity 0.3s; }
   .side-card-a { border-color: rgba(0,212,255,0.15); }
   .side-card-b { border-color: rgba(255,106,0,0.15); }
+  .side-card-won { border-color: rgba(0,255,136,0.3) !important; background: rgba(0,255,136,0.04) !important; }
+  .side-card-lost { opacity: 0.35; }
 
   .side-card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
   .side-card-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
@@ -98,17 +151,20 @@
   .side-card-label { font-size: 0.88rem; font-weight: 800; }
   .side-card-a .side-card-label { color: var(--neon-blue); }
   .side-card-b .side-card-label { color: var(--neon-orange); }
+  .side-card-won .side-card-label { color: var(--neon-green) !important; }
 
   .participant-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; gap: 0.5rem; }
   .participant-row:last-child { border-bottom: none; }
   .participant-name { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 0; }
-  .participant-avatar { font-size: 1rem; flex-shrink: 0; }
-  .participant-username { font-weight: 600; truncate: true; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .participant-stake { font-size: 0.75rem; color: var(--muted); }
-  .participant-amount { font-weight: 800; font-size: 0.88rem; white-space: nowrap; }
+  .participant-avatar { font-size: 1rem; flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .participant-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .participant-username { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .participant-stake { font-size: 0.72rem; color: var(--muted); }
+  .participant-right { text-align: right; white-space: nowrap; }
+  .participant-amount { font-weight: 800; font-size: 0.85rem; }
   .amount-a { color: var(--neon-blue); }
   .amount-b { color: var(--neon-orange); }
-  .participant-winner { color: var(--neon-yellow); }
+  .participant-payout { font-size: 0.72rem; color: var(--neon-green); font-weight: 700; }
   .no-participants { font-size: 0.82rem; color: var(--muted); text-align: center; padding: 1rem 0; }
 
   /* Join card */
@@ -122,34 +178,20 @@
   .side-btn-b.selected { background: rgba(255,106,0,0.1); border-color: var(--neon-orange); color: var(--neon-orange); }
   .side-btn:hover { background: rgba(255,255,255,0.05); }
 
-  .join-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem; }
-
   label { display: block; font-size: 0.75rem; font-weight: 700; color: #444; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.4rem; }
-
   input[type="text"] { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: 9px; padding: 0.7rem 0.9rem; color: var(--text); font-size: 0.95rem; font-family: inherit; transition: all 0.2s; }
   input::placeholder { color: #2a2a2a; }
   input:focus { outline: none; border-color: var(--neon-blue); background: rgba(0,212,255,0.05); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
-
-  .kloins-hint { font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; }
-  .kloins-hint .kloins-val { color: var(--neon-yellow); font-weight: 800; }
 
   .btn-join { width: 100%; padding: 0.85rem; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 800; cursor: pointer; font-family: inherit; letter-spacing: 0.02em; text-transform: uppercase; background: var(--neon-blue); color: #000; box-shadow: 0 0 16px rgba(0,212,255,0.3); transition: all 0.2s; }
   .btn-join:hover:not(:disabled) { box-shadow: 0 0 28px rgba(0,212,255,0.5); transform: translateY(-1px); }
   .btn-join:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-  /* Result card */
+  /* Result entry card (open/closed) */
   .result-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.18s cubic-bezier(0.16,1,0.3,1) both; }
-
-  .winner-display { background: rgba(245,255,0,0.06); border: 1px solid rgba(245,255,0,0.2); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
-  .winner-display-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.3rem; }
-  .winner-display-val { font-size: 1.1rem; font-weight: 800; color: var(--neon-yellow); }
-  .winner-display-desc { font-size: 0.82rem; color: var(--muted); margin-top: 0.25rem; }
 
   .result-buttons { display: flex; gap: 0.7rem; margin-bottom: 1rem; }
   .result-btn { flex: 1; padding: 0.7rem; border-radius: 10px; border: 2px solid transparent; background: rgba(255,255,255,0.03); color: var(--muted); font-family: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
-  .result-btn.win-a { }
-  .result-btn.win-b { }
-  .result-btn.win-draw { }
   .result-btn.sel-a { background: rgba(0,212,255,0.1); border-color: var(--neon-blue); color: var(--neon-blue); }
   .result-btn.sel-b { background: rgba(255,106,0,0.1); border-color: var(--neon-orange); color: var(--neon-orange); }
   .result-btn.sel-draw { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.3); color: var(--text); }
@@ -162,6 +204,20 @@
   .btn-resolve { width: 100%; padding: 0.85rem; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 800; cursor: pointer; font-family: inherit; letter-spacing: 0.02em; text-transform: uppercase; background: var(--neon-green); color: #000; box-shadow: 0 0 16px rgba(0,255,136,0.3); transition: all 0.2s; margin-top: 0.8rem; }
   .btn-resolve:hover:not(:disabled) { box-shadow: 0 0 28px rgba(0,255,136,0.5); transform: translateY(-1px); }
   .btn-resolve:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* Dezente "Ergebnis korrigieren" Sektion (resolved) */
+  .change-result-wrap { margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.2s cubic-bezier(0.16,1,0.3,1) both; }
+  .btn-change-result {
+    background: none; border: none; color: var(--muted);
+    font-family: inherit; font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; padding: 0; transition: color 0.2s;
+    display: flex; align-items: center; gap: 0.3rem;
+  }
+  .btn-change-result:hover { color: #777; }
+  .change-result-form {
+    margin-top: 1rem; background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 1.2rem;
+  }
 
   /* History */
   .history-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.22s cubic-bezier(0.16,1,0.3,1) both; }
@@ -194,9 +250,9 @@
     .bottom-nav { display: grid; }
     .page { padding-bottom: 5rem; }
     .sides-grid { grid-template-columns: 1fr; }
-    .join-row { grid-template-columns: 1fr; }
     .result-buttons { flex-direction: column; }
     .pot-bar { gap: 1rem; }
+    .winner-hero-users { gap: 1.5rem; }
   }
 
   #loadingScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; font-size: 2rem; animation: pulse 1s ease-in-out infinite; }
@@ -239,13 +295,16 @@
     <!-- Bet Header -->
     <div class="bet-header" id="betHeader"></div>
 
-    <!-- Pot -->
-    <div class="pot-bar" id="potBar"></div>
+    <!-- Winner Hero (resolved only) -->
+    <div id="winnerHero"></div>
+
+    <!-- Pot (open/closed only) -->
+    <div class="pot-bar" id="potBar" style="display:none"></div>
 
     <!-- Sides -->
     <div class="sides-grid" id="sidesGrid"></div>
 
-    <!-- Join (if open + not yet joined) -->
+    <!-- Join (open + not yet joined) -->
     <div class="join-card" id="joinCard" style="display:none">
       <div class="section-title">🎯 Mitmachen</div>
       <div class="side-selector" style="margin-bottom:1rem">
@@ -260,17 +319,32 @@
       <button class="btn-join" id="btnJoin" onclick="joinBet()">Jetzt einsteigen →</button>
     </div>
 
-    <!-- Result -->
+    <!-- Ergebnis eintragen (open/closed) -->
     <div class="result-card" id="resultCard" style="display:none">
       <div class="section-title">🏁 Ergebnis eintragen</div>
-      <div id="currentResult" style="display:none"></div>
-      <div style="margin-bottom:0.8rem;font-size:0.82rem;color:var(--muted);">Gewinner-Seite wählen:</div>
+      <div style="margin-bottom:0.8rem;font-size:0.82rem;color:var(--muted)">Gewinner-Seite wählen:</div>
       <div class="result-buttons" id="resultBtns"></div>
       <div style="margin-top:0.8rem">
         <label>Ergebnisbeschreibung</label>
         <textarea id="resultDesc" placeholder="Was ist passiert?"></textarea>
       </div>
       <button class="btn-resolve" id="btnResolve" onclick="submitResult()">Ergebnis speichern →</button>
+    </div>
+
+    <!-- Ergebnis korrigieren (resolved, dezent) -->
+    <div class="change-result-wrap" id="changeResultWrap" style="display:none">
+      <button class="btn-change-result" onclick="toggleChangeResult()">
+        <span id="changeResultArrow">▸</span> Ergebnis korrigieren
+      </button>
+      <div class="change-result-form" id="changeResultForm" style="display:none">
+        <div style="margin-bottom:0.8rem;font-size:0.82rem;color:var(--muted)">Andere Seite wählen:</div>
+        <div class="result-buttons" id="changeResultBtns"></div>
+        <div style="margin-top:0.8rem">
+          <label>Ergebnisbeschreibung</label>
+          <textarea id="changeResultDesc" placeholder="Was ist passiert?"></textarea>
+        </div>
+        <button class="btn-resolve" id="btnResolveChange" onclick="submitResult(true)" style="background:rgba(255,255,255,0.08);color:var(--text);box-shadow:none;border:1px solid var(--border)">Korrektur speichern →</button>
+      </div>
     </div>
 
     <!-- History -->
@@ -343,6 +417,7 @@ let profiles = {};
 let joinSide = null;
 let joinStakeType = 'kloins';
 let resultSide = null;
+let changeSide = null;
 const betId = new URLSearchParams(location.search).get('id');
 
 async function init() {
@@ -367,18 +442,18 @@ async function init() {
     userKloins = profileRes.data.kloins ?? 1000;
   }
 
-  // Load all participant profiles
   const userIds = [...new Set(participants.map(p => p.user_id))];
   if (userIds.length > 0) {
-    const { data: profs } = await sb.from('profiles').select('id, username, avatar').in('id', userIds);
+    const { data: profs } = await sb.from('profiles').select('id, username, avatar, avatar_url').in('id', userIds);
     (profs || []).forEach(p => { profiles[p.id] = p; });
   }
 
   renderBetHeader();
+  renderWinnerHero();
   renderPot();
   renderSides();
   renderJoin();
-  renderResult();
+  renderResultSection();
   await renderHistory();
 
   document.getElementById('loadingScreen').style.display = 'none';
@@ -390,35 +465,115 @@ function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'
 function fmtDate(d) {
   return new Date(d).toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
-
 function fmtEndsAt(d) {
   const date = new Date(d);
   if (date.getFullYear() >= 2090) return 'Kein Limit';
   return fmtDate(d);
 }
 
+// Calculates expected payouts for kloins participants
+function calcPayouts() {
+  const kp = participants.filter(p => !p.stake_description);
+  const total = kp.reduce((s, p) => s + p.amount, 0);
+  const map = {};
+  if (!bet.winner_side) return map;
+  if (bet.winner_side === 'draw') {
+    kp.forEach(p => { map[p.user_id] = { payout: p.amount, profit: 0 }; });
+    return map;
+  }
+  const wsum = kp.filter(p => p.side === bet.winner_side).reduce((s, p) => s + p.amount, 0);
+  const loot = total - wsum;
+  kp.forEach(p => {
+    if (p.side === bet.winner_side && wsum > 0) {
+      const payout = p.amount + Math.floor((p.amount / wsum) * loot);
+      map[p.user_id] = { payout, profit: payout - p.amount };
+    } else {
+      map[p.user_id] = { payout: 0, profit: -p.amount };
+    }
+  });
+  return map;
+}
+
 function renderBetHeader() {
   const statusClass = { open:'status-open', closed:'status-closed', resolved:'status-resolved' }[bet.status];
   const statusLabel = { open:'Offen', closed:'Geschlossen', resolved:'Abgerechnet' }[bet.status];
+  const showMeta = bet.status !== 'resolved';
   document.getElementById('betHeader').innerHTML = `
     <div class="bet-header-top">
       <div class="bet-header-title">${esc(bet.title)}</div>
       <span class="status-badge ${statusClass}">${statusLabel}</span>
     </div>
     ${bet.description ? `<div class="bet-header-desc">${esc(bet.description)}</div>` : ''}
-    <div class="bet-meta-row">
+    ${showMeta ? `<div class="bet-meta-row">
       <div class="bet-meta-item">Endet: <strong>${fmtEndsAt(bet.ends_at)}</strong></div>
-      ${bet.resolved_at ? `<div class="bet-meta-item">Abgerechnet: <strong>${fmtDate(bet.resolved_at)}</strong></div>` : ''}
+    </div>` : ''}`;
+}
+
+function renderWinnerHero() {
+  const el = document.getElementById('winnerHero');
+  if (bet.status !== 'resolved' || !bet.winner_side) { el.innerHTML = ''; return; }
+
+  if (bet.winner_side === 'draw') {
+    el.innerHTML = `<div class="draw-hero">
+      <div class="draw-hero-icon">🤝</div>
+      <div class="draw-hero-label">Ergebnis</div>
+      <div class="draw-hero-text">Unentschieden — jeder bekommt seinen Einsatz zurück</div>
+      ${bet.result_description ? `<div class="draw-hero-desc">"${esc(bet.result_description)}"</div>` : ''}
     </div>`;
+    return;
+  }
+
+  const payouts = calcPayouts();
+  const winners = participants.filter(p => p.side === bet.winner_side);
+  const teamLabel = bet.winner_side === 'A' ? bet.side_a_label : bet.side_b_label;
+
+  const usersHtml = winners.map(p => {
+    const prof = profiles[p.user_id] || {};
+    const stake = parseStake(p);
+    const pd = payouts[p.user_id];
+    const isMe = p.user_id === currentUser.id;
+
+    const avInner = prof.avatar_url
+      ? `<img src="${esc(prof.avatar_url)}" alt="">`
+      : esc(prof.avatar || '🎮');
+
+    let gainHtml = '';
+    if (stake.isKloins && pd) {
+      if (pd.profit > 0) {
+        gainHtml = `<div class="winner-hero-gain-label">Gewinn</div><div class="winner-hero-gain">+${pd.profit.toLocaleString('de-DE')} Kloins</div>`;
+      } else {
+        gainHtml = `<div class="winner-hero-gain-zero">Einsatz zurück</div>`;
+      }
+    } else {
+      gainHtml = `<div class="winner-hero-stake">${stake.icon} ${esc(stake.label)}</div>`;
+    }
+
+    return `<div class="winner-hero-user">
+      <div class="winner-hero-avatar">${avInner}</div>
+      <div class="winner-hero-name">${esc(prof.username || 'User')}${isMe ? ' <span class="winner-hero-me">(du)</span>' : ''}</div>
+      ${gainHtml}
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="winner-hero">
+    <div class="winner-hero-eyebrow">🏆 Gewonnen</div>
+    <div class="winner-hero-users">${usersHtml || '<div style="color:var(--muted);font-size:0.85rem">–</div>'}</div>
+    <div class="winner-hero-footer">
+      <span class="winner-hero-team">${esc(teamLabel)}</span>
+      ${bet.result_description ? ` · <em style="color:var(--muted)">"${esc(bet.result_description)}"</em>` : ''}
+    </div>
+  </div>`;
 }
 
 function renderPot() {
-  // Only count Kloins stakes (stake_description is null = kloins)
+  const potEl = document.getElementById('potBar');
+  if (bet.status === 'resolved') { potEl.style.display = 'none'; return; }
   const kloinsA = participants.filter(p => p.side === 'A' && !p.stake_description).reduce((s,p) => s+p.amount, 0);
   const kloinsB = participants.filter(p => p.side === 'B' && !p.stake_description).reduce((s,p) => s+p.amount, 0);
   const total = kloinsA + kloinsB;
   const hasNonKloins = participants.some(p => p.stake_description);
-  document.getElementById('potBar').innerHTML = `
+  potEl.style.display = '';
+  potEl.innerHTML = `
     <div class="pot-total">
       <div class="pot-total-label">Kloins-Pot</div>
       <div class="pot-total-val">💰 ${total.toLocaleString('de-DE')} Kloins</div>
@@ -438,40 +593,61 @@ function renderPot() {
 }
 
 function renderSides() {
+  const payouts = calcPayouts();
   const partsA = participants.filter(p => p.side === 'A');
   const partsB = participants.filter(p => p.side === 'B');
+  const isResolved = bet.status === 'resolved';
+  const wonA = isResolved && bet.winner_side === 'A';
+  const wonB = isResolved && bet.winner_side === 'B';
 
-  function participantRows(parts, colorClass) {
+  function participantRows(parts, amountClass) {
     if (parts.length === 0) return '<div class="no-participants">Noch niemand</div>';
     return parts.map(p => {
       const prof = profiles[p.user_id] || {};
-      const isWinner = bet.status === 'resolved' && bet.winner_side === p.side;
       const isMe = p.user_id === currentUser.id;
       const stake = parseStake(p);
+      const pd = payouts[p.user_id];
+      const avInner = prof.avatar_url
+        ? `<img src="${esc(prof.avatar_url)}" alt="">`
+        : esc(prof.avatar || '🎮');
+
+      let rightHtml = '';
+      if (stake.isKloins) {
+        rightHtml = `<div class="participant-amount ${amountClass}">${p.amount.toLocaleString('de-DE')}</div>`;
+        if (isResolved && pd && pd.profit > 0) {
+          rightHtml += `<div class="participant-payout">+${pd.profit.toLocaleString('de-DE')}</div>`;
+        }
+      }
+
       return `<div class="participant-row">
         <div class="participant-name">
-          <span class="participant-avatar">${esc(prof.avatar || '🎮')}</span>
+          <div class="participant-avatar">${avInner}</div>
           <div>
-            <div class="participant-username">${esc(prof.username || 'User')}${isMe ? ' <span style="color:var(--muted);font-size:0.7rem">(du)</span>' : ''}</div>
+            <div class="participant-username">${esc(prof.username || 'User')}${isMe ? ' <span style="color:var(--muted);font-size:0.68rem">(du)</span>' : ''}</div>
             <div class="participant-stake">${stake.icon} ${esc(stake.label)}</div>
           </div>
         </div>
-        <div class="participant-amount ${stake.isKloins ? colorClass : ''} ${isWinner ? 'participant-winner' : ''}" style="${!stake.isKloins ? 'color:var(--muted);font-size:0.75rem' : ''}">${isWinner ? '🏆 ' : ''}${stake.isKloins ? p.amount.toLocaleString('de-DE') + ' Kloins' : ''}</div>
+        <div class="participant-right">${rightHtml}</div>
       </div>`;
     }).join('');
   }
 
+  const cardClassA = isResolved ? (wonA ? 'side-card side-card-a side-card-won' : 'side-card side-card-a side-card-lost') : 'side-card side-card-a';
+  const cardClassB = isResolved ? (wonB ? 'side-card side-card-b side-card-won' : 'side-card side-card-b side-card-lost') : 'side-card side-card-b';
+  const dotClassA = wonA ? 'side-card-dot' : 'side-card-dot side-card-dot-a';
+  const dotClassB = wonB ? 'side-card-dot' : 'side-card-dot side-card-dot-b';
+
   document.getElementById('sidesGrid').innerHTML = `
-    <div class="side-card side-card-a">
+    <div class="${cardClassA}">
       <div class="side-card-header">
-        <div class="side-card-dot side-card-dot-a"></div>
+        <div class="${dotClassA}" style="${wonA ? 'background:var(--neon-green);box-shadow:0 0 8px rgba(0,255,136,0.5)' : ''}"></div>
         <div class="side-card-label">${esc(bet.side_a_label)}</div>
       </div>
       ${participantRows(partsA, 'amount-a')}
     </div>
-    <div class="side-card side-card-b">
+    <div class="${cardClassB}">
       <div class="side-card-header">
-        <div class="side-card-dot side-card-dot-b"></div>
+        <div class="${dotClassB}" style="${wonB ? 'background:var(--neon-green);box-shadow:0 0 8px rgba(0,255,136,0.5)' : ''}"></div>
         <div class="side-card-label">${esc(bet.side_b_label)}</div>
       </div>
       ${participantRows(partsB, 'amount-b')}
@@ -480,14 +656,13 @@ function renderSides() {
 
 function renderJoin() {
   const alreadyJoined = participants.some(p => p.user_id === currentUser.id);
-  const canJoin = (bet.status === 'open') && !alreadyJoined;
+  const canJoin = bet.status === 'open' && !alreadyJoined;
   const joinCard = document.getElementById('joinCard');
   if (!canJoin) { joinCard.style.display = 'none'; return; }
   joinCard.style.display = '';
   document.getElementById('joinBtnA').textContent = bet.side_a_label;
   document.getElementById('joinBtnB').textContent = bet.side_b_label;
 
-  // Build stake type pills
   const typesEl = document.getElementById('joinStakeTypes');
   typesEl.innerHTML = STAKE_TYPES.map(t => `
     <button onclick="selectJoinStake('${t.id}')" data-id="${t.id}"
@@ -580,91 +755,91 @@ async function joinBet() {
   setTimeout(() => location.reload(), 900);
 }
 
-function renderResult() {
-  const resultCard = document.getElementById('resultCard');
-  // Show result card if open or closed (allow any logged-in user)
+function renderResultSection() {
   if (bet.status === 'resolved') {
-    // Show current result display but not the form
-    const current = document.getElementById('currentResult');
-    const sideLabel = { A: bet.side_a_label, B: bet.side_b_label, draw: 'Unentschieden' }[bet.winner_side] || '';
-    current.style.display = '';
-    current.innerHTML = `
-      <div class="winner-display" style="margin-bottom:1rem">
-        <div class="winner-display-label">Ergebnis</div>
-        <div class="winner-display-val">🏆 ${esc(sideLabel)} gewinnt</div>
-        ${bet.result_description ? `<div class="winner-display-desc">${esc(bet.result_description)}</div>` : ''}
-      </div>`;
-    // Still allow changing result
-    resultCard.style.display = '';
+    // Open/closed form hidden; show dezente "korrigieren" option
+    document.getElementById('resultCard').style.display = 'none';
+    document.getElementById('changeResultWrap').style.display = '';
+
+    const btns = document.getElementById('changeResultBtns');
+    btns.innerHTML = `
+      <button class="result-btn" id="crA" onclick="selectChange('A')">${esc(bet.side_a_label)} gewinnt</button>
+      <button class="result-btn" id="crB" onclick="selectChange('B')">${esc(bet.side_b_label)} gewinnt</button>
+      <button class="result-btn" id="crDraw" onclick="selectChange('draw')">Unentschieden</button>`;
+
+    if (bet.winner_side) {
+      selectChange(bet.winner_side);
+      if (bet.result_description) document.getElementById('changeResultDesc').value = bet.result_description;
+    }
   } else {
-    resultCard.style.display = '';
+    // Not yet resolved: show full form
+    document.getElementById('changeResultWrap').style.display = 'none';
+    document.getElementById('resultCard').style.display = '';
+
+    const btns = document.getElementById('resultBtns');
+    btns.innerHTML = `
+      <button class="result-btn" id="rbA" onclick="selectResult('A')">${esc(bet.side_a_label)} gewinnt</button>
+      <button class="result-btn" id="rbB" onclick="selectResult('B')">${esc(bet.side_b_label)} gewinnt</button>
+      <button class="result-btn" id="rbDraw" onclick="selectResult('draw')">Unentschieden</button>`;
   }
-
-  // Build result buttons
-  const btns = document.getElementById('resultBtns');
-  btns.innerHTML = `
-    <button class="result-btn win-a" id="rbA" onclick="selectResult('A')">${esc(bet.side_a_label)} gewinnt</button>
-    <button class="result-btn win-b" id="rbB" onclick="selectResult('B')">${esc(bet.side_b_label)} gewinnt</button>
-    <button class="result-btn win-draw" id="rbDraw" onclick="selectResult('draw')">Unentschieden</button>`;
-
-  // Pre-fill if already resolved
-  if (bet.winner_side) {
-    selectResult(bet.winner_side);
-    if (bet.result_description) document.getElementById('resultDesc').value = bet.result_description;
-    document.getElementById('btnResolve').textContent = 'Ergebnis ändern →';
-  }
-
-  document.getElementById('resultCard').querySelector('.section-title').textContent =
-    bet.status === 'resolved' ? '🏁 Ergebnis bearbeiten' : '🏁 Ergebnis eintragen';
 }
 
 function selectResult(side) {
   resultSide = side;
-  document.getElementById('rbA').className    = 'result-btn win-a' + (side==='A' ? ' sel-a' : '');
-  document.getElementById('rbB').className    = 'result-btn win-b' + (side==='B' ? ' sel-b' : '');
-  document.getElementById('rbDraw').className = 'result-btn win-draw' + (side==='draw' ? ' sel-draw' : '');
+  document.getElementById('rbA').className    = 'result-btn' + (side==='A' ? ' sel-a' : '');
+  document.getElementById('rbB').className    = 'result-btn' + (side==='B' ? ' sel-b' : '');
+  document.getElementById('rbDraw').className = 'result-btn' + (side==='draw' ? ' sel-draw' : '');
 }
 
-async function submitResult() {
-  if (!resultSide) return showAlert('Bitte einen Gewinner wählen.', 'error');
-  const desc = document.getElementById('resultDesc').value.trim();
+function selectChange(side) {
+  changeSide = side;
+  document.getElementById('crA').className    = 'result-btn' + (side==='A' ? ' sel-a' : '');
+  document.getElementById('crB').className    = 'result-btn' + (side==='B' ? ' sel-b' : '');
+  document.getElementById('crDraw').className = 'result-btn' + (side==='draw' ? ' sel-draw' : '');
+}
 
-  document.getElementById('btnResolve').disabled = true;
-  document.getElementById('btnResolve').textContent = 'Speichert…';
+function toggleChangeResult() {
+  const form = document.getElementById('changeResultForm');
+  const arrow = document.getElementById('changeResultArrow');
+  const open = form.style.display === 'none';
+  form.style.display = open ? '' : 'none';
+  arrow.textContent = open ? '▾' : '▸';
+}
 
-  // Save history entry first (if there was a previous result)
+async function submitResult(isChange) {
+  const side = isChange ? changeSide : resultSide;
+  if (!side) return showAlert('Bitte einen Gewinner wählen.', 'error');
+  const descId = isChange ? 'changeResultDesc' : 'resultDesc';
+  const btnId  = isChange ? 'btnResolveChange' : 'btnResolve';
+  const desc = document.getElementById(descId).value.trim();
+
+  document.getElementById(btnId).disabled = true;
+  document.getElementById(btnId).textContent = 'Speichert…';
+
   if (bet.winner_side) {
     await sb.from('bet_result_history').insert({
-      bet_id: betId,
-      changed_by: currentUser.id,
-      old_result: bet.result_description || null,
-      new_result: desc || null,
-      old_winner_side: bet.winner_side,
-      new_winner_side: resultSide
+      bet_id: betId, changed_by: currentUser.id,
+      old_result: bet.result_description || null, new_result: desc || null,
+      old_winner_side: bet.winner_side, new_winner_side: side
     });
   }
 
-  // Update bet
   const { error } = await sb.from('bets').update({
-    status: 'resolved',
-    winner_side: resultSide,
+    status: 'resolved', winner_side: side,
     result_description: desc || null,
-    resolved_at: new Date().toISOString(),
-    resolved_by: currentUser.id
+    resolved_at: new Date().toISOString(), resolved_by: currentUser.id
   }).eq('id', betId);
 
   if (error) {
-    document.getElementById('btnResolve').disabled = false;
-    document.getElementById('btnResolve').textContent = 'Ergebnis speichern →';
+    document.getElementById(btnId).disabled = false;
+    document.getElementById(btnId).textContent = isChange ? 'Korrektur speichern →' : 'Ergebnis speichern →';
     return showAlert('Fehler: ' + error.message, 'error');
   }
 
-  // Distribute kloins (only if first resolution or side changed)
   const wasResolved = bet.status === 'resolved';
-  const sideChanged = bet.winner_side !== resultSide;
-
+  const sideChanged = bet.winner_side !== side;
   if (!wasResolved || sideChanged) {
-    await distributeKloins(resultSide, wasResolved ? bet.winner_side : null);
+    await distributeKloins(side, wasResolved ? bet.winner_side : null);
   }
 
   showAlert('✓ Ergebnis gespeichert!', 'success');
@@ -672,8 +847,6 @@ async function submitResult() {
 }
 
 async function distributeKloins(winnerSide, previousWinnerSide) {
-  // Uses a SECURITY DEFINER RPC to bypass RLS — avoids the bug where
-  // reading/writing other users' profiles would fail or produce kloins = 0 + payout.
   const { error } = await sb.rpc('distribute_bet_kloins', {
     p_bet_id: betId,
     p_winner_side: winnerSide,
@@ -693,7 +866,6 @@ async function renderHistory() {
 
   document.getElementById('historyCard').style.display = '';
 
-  // Load changer profiles
   const changerIds = [...new Set(history.map(h => h.changed_by))];
   const { data: changerProfs } = await sb.from('profiles').select('id, username, avatar').in('id', changerIds);
   const changerMap = {};
@@ -711,8 +883,7 @@ async function renderHistory() {
         </div>
         <div class="history-entry-change">
           <strong>${esc(sideLabel(h.old_winner_side))}</strong> → <strong>${esc(sideLabel(h.new_winner_side))}</strong>
-          ${h.old_result ? ` | ${esc(h.old_result)}` : ''}
-          ${h.new_result ? ` → ${esc(h.new_result)}` : ''}
+          ${h.new_result ? ` · ${esc(h.new_result)}` : ''}
         </div>
       </div>`;
   }).join('');

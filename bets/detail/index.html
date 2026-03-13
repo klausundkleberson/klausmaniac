@@ -672,53 +672,14 @@ async function submitResult() {
 }
 
 async function distributeKloins(winnerSide, previousWinnerSide) {
-  // If re-resolving: first undo previous distribution by recalculating
-  // Simpler: just recalculate everything from current participants
-
-  const total = participants.reduce((s, p) => s + p.amount, 0);
-  const winners = participants.filter(p => p.side === winnerSide);
-  const winnerSum = winners.reduce((s, p) => s + p.amount, 0);
-  const loserPot = total - winnerSum;
-
-  const updates = [];
-
-  if (winnerSide === 'draw') {
-    // Everyone gets their stake back — load current kloins and add back
-    for (const p of participants) {
-      const { data: prof } = await sb.from('profiles').select('kloins, bets_played').eq('id', p.user_id).single();
-      const currentKloins = prof?.kloins ?? 0;
-      const currentPlayed = prof?.bets_played ?? 0;
-      updates.push(
-        sb.from('profiles').update({
-          kloins: currentKloins + p.amount,
-          bets_played: currentPlayed + (previousWinnerSide ? 0 : 1)
-        }).eq('id', p.user_id)
-      );
-    }
-  } else {
-    for (const p of participants) {
-      const { data: prof } = await sb.from('profiles').select('kloins, bets_won, bets_played').eq('id', p.user_id).single();
-      const currentKloins = prof?.kloins ?? 0;
-      const currentWon = prof?.bets_won ?? 0;
-      const currentPlayed = prof?.bets_played ?? 0;
-      const isWinner = p.side === winnerSide;
-
-      let payout = 0;
-      if (isWinner && winnerSum > 0) {
-        payout = p.amount + Math.floor((p.amount / winnerSum) * loserPot);
-      }
-
-      updates.push(
-        sb.from('profiles').update({
-          kloins: currentKloins + payout,
-          bets_won: isWinner ? currentWon + 1 : currentWon,
-          bets_played: currentPlayed + (previousWinnerSide ? 0 : 1)
-        }).eq('id', p.user_id)
-      );
-    }
-  }
-
-  await Promise.all(updates);
+  // Uses a SECURITY DEFINER RPC to bypass RLS — avoids the bug where
+  // reading/writing other users' profiles would fail or produce kloins = 0 + payout.
+  const { error } = await sb.rpc('distribute_bet_kloins', {
+    p_bet_id: betId,
+    p_winner_side: winnerSide,
+    p_previous_winner_side: previousWinnerSide || null
+  });
+  if (error) console.error('Kloins-Verteilung fehlgeschlagen:', error);
 }
 
 async function renderHistory() {

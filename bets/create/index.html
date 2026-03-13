@@ -108,38 +108,49 @@
   .side-btn-b.selected { background: rgba(255,106,0,0.1); border-color: var(--neon-orange); color: var(--neon-orange); box-shadow: 0 0 14px rgba(255,106,0,0.2); }
   .side-btn:hover { background: rgba(255,255,255,0.05); }
 
-  /* Stake type picker */
-  .stake-types {
-    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.2rem;
-  }
-  .stake-type-btn {
-    display: flex; align-items: center; gap: 0.35rem;
-    padding: 0.45rem 0.8rem; border-radius: 999px;
+  /* Stake builder */
+  .add-stake-types { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 1rem; }
+  .add-stake-btn {
+    display: flex; align-items: center; gap: 0.3rem;
+    padding: 0.38rem 0.75rem; border-radius: 999px;
     border: 1px solid var(--border); background: rgba(255,255,255,0.03);
-    color: var(--muted); font-family: inherit; font-size: 0.8rem; font-weight: 700;
-    cursor: pointer; transition: all 0.18s; white-space: nowrap;
+    color: var(--muted); font-family: inherit; font-size: 0.78rem; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
   }
-  .stake-type-btn:hover { border-color: rgba(255,255,255,0.18); color: var(--text); }
-  .stake-type-btn.active {
-    background: rgba(245,255,0,0.1); border-color: rgba(245,255,0,0.4);
-    color: var(--neon-yellow); box-shadow: 0 0 10px rgba(245,255,0,0.15);
+  .add-stake-btn:hover:not(:disabled) { border-color: rgba(255,255,255,0.2); color: var(--text); background: rgba(255,255,255,0.06); }
+  .add-stake-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+  .stake-list { display: flex; flex-direction: column; gap: 0.6rem; }
+  .stake-item {
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 12px; padding: 0.85rem 1rem;
   }
-  .stake-type-icon { font-size: 1rem; }
+  .stake-item-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.55rem; }
+  .stake-item-icon { font-size: 1.1rem; }
+  .stake-item-label { font-size: 0.78rem; font-weight: 800; color: var(--text); flex: 1; }
+  .stake-remove {
+    width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border);
+    background: rgba(255,0,60,0.08); color: #ff4466; font-size: 0.8rem; font-weight: 800;
+    font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0; line-height: 1;
+  }
+  .stake-remove:hover { background: rgba(255,0,60,0.2); border-color: rgba(255,0,60,0.4); }
 
-  .stake-fields { }
-  .stake-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; }
-  .stake-hint .kloins-val { color: var(--neon-yellow); font-weight: 800; }
+  .stake-item input[type="text"] { margin-bottom: 0; }
+  .stake-kloins-hint { font-size: 0.72rem; color: var(--muted); margin-top: 0.35rem; }
+  .stake-kloins-hint span { color: var(--neon-yellow); font-weight: 800; }
 
-  .suggestions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.55rem; }
+  .suggestions { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.45rem; }
   .suggestion-pill {
-    padding: 0.3rem 0.7rem; border-radius: 999px;
+    padding: 0.25rem 0.6rem; border-radius: 999px;
     border: 1px solid var(--border); background: rgba(255,255,255,0.03);
-    color: #666; font-size: 0.75rem; font-weight: 600;
-    font-family: inherit; cursor: pointer; transition: all 0.15s;
-    white-space: nowrap;
+    color: #555; font-size: 0.72rem; font-weight: 600;
+    font-family: inherit; cursor: pointer; transition: all 0.15s; white-space: nowrap;
   }
   .suggestion-pill:hover { border-color: rgba(255,255,255,0.2); color: var(--text); background: rgba(255,255,255,0.06); }
   .suggestion-pill.used { border-color: rgba(245,255,0,0.35); color: var(--neon-yellow); background: rgba(245,255,0,0.07); }
+
+  .stake-empty { font-size: 0.8rem; color: #333; text-align: center; padding: 0.8rem; }
 
   .alert { display: none; padding: 0.7rem 0.9rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; }
   .alert.error   { display: block; background: rgba(255,0,60,0.1); border: 1px solid rgba(255,0,60,0.3); color: #ff6b8a; }
@@ -164,6 +175,18 @@
 
   #loadingScreen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; font-size: 2rem; animation: pulse 1s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Invite */
+  .invite-search-wrap { position: relative; }
+  .invite-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 20; background: #0d0d14; border: 1px solid var(--border); border-radius: 10px; margin-top: 4px; overflow: hidden; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+  .invite-result-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.8rem; cursor: pointer; transition: background 0.15s; font-size: 0.85rem; }
+  .invite-result-item:hover { background: rgba(255,255,255,0.05); }
+  .invite-result-item img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .invite-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem; min-height: 0; }
+  .invite-chip { display: flex; align-items: center; gap: 0.4rem; background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); border-radius: 999px; padding: 0.25rem 0.6rem 0.25rem 0.35rem; font-size: 0.78rem; font-weight: 700; color: var(--neon-blue); }
+  .invite-chip img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; }
+  .invite-chip-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; line-height: 1; padding: 0; margin-left: 2px; font-family: inherit; }
+  .invite-chip-remove:hover { color: var(--neon-red); }
 </style>
 </head>
 <body>
@@ -259,12 +282,26 @@
         </div>
       </div>
 
-      <div class="form-group" style="margin-bottom:0.8rem">
-        <label>Einsatzart *</label>
-        <div class="stake-types" id="stakeTypes"></div>
+      <div class="form-group" style="margin-bottom:0.7rem">
+        <label>Einsatz hinzufügen</label>
+        <div class="add-stake-types" id="addStakeTypes"></div>
       </div>
 
-      <div class="stake-fields" id="stakeFields"></div>
+      <div class="stake-list" id="stakeList">
+        <div class="stake-empty">Noch kein Einsatz — wähle oben eine Art.</div>
+      </div>
+    </div>
+
+    <!-- Einladen -->
+    <div class="card" style="animation-delay:0.15s">
+      <div class="card-title">📬 Personen einladen <span style="color:#333;font-size:0.7rem;font-weight:600;text-transform:none;letter-spacing:0">(optional)</span></div>
+      <div class="form-group" style="margin-bottom:0">
+        <div class="invite-search-wrap">
+          <input type="text" id="inviteSearch" placeholder="🔍 Username suchen…" autocomplete="off" oninput="onInviteSearch(this.value)">
+          <div class="invite-results" id="inviteResults" style="display:none"></div>
+        </div>
+        <div class="invite-chips" id="inviteChips"></div>
+      </div>
     </div>
 
     <button class="btn-save" id="btnSave" onclick="createBet()">Wette erstellen →</button>
@@ -354,62 +391,193 @@ const STAKE_TYPES = [
 
 let currentUser = null;
 let selectedSide = null;
-let selectedStakeType = 'kloins';
 let userKloins = 1000;
+let stakeItems = []; // [{id, typeId, uid}]
+let stakeUid = 0;
 
-function buildStakeTypes() {
-  const container = document.getElementById('stakeTypes');
-  container.innerHTML = STAKE_TYPES.map(t => `
-    <button class="stake-type-btn${t.id === 'kloins' ? ' active' : ''}"
-            onclick="selectStakeType('${t.id}')"
-            data-id="${t.id}">
-      <span class="stake-type-icon">${t.icon}</span>${t.label}
+function buildAddStakeTypes() {
+  document.getElementById('addStakeTypes').innerHTML = STAKE_TYPES.map(t => `
+    <button class="add-stake-btn" data-id="${t.id}" onclick="addStake('${t.id}')">
+      ${t.icon} + ${t.label}
     </button>`).join('');
-  renderStakeFields('kloins');
+  refreshAddButtons();
 }
 
-function selectStakeType(id) {
-  selectedStakeType = id;
-  document.querySelectorAll('.stake-type-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.id === id);
+function refreshAddButtons() {
+  const hasKloins = stakeItems.some(s => s.typeId === 'kloins');
+  document.querySelectorAll('.add-stake-btn').forEach(b => {
+    b.disabled = b.dataset.id === 'kloins' && hasKloins;
   });
-  renderStakeFields(id);
 }
 
-function renderStakeFields(id) {
-  const type = STAKE_TYPES.find(t => t.id === id);
-  const fields = document.getElementById('stakeFields');
-  if (type.isKloins) {
-    fields.innerHTML = `
-      <div class="form-group" style="margin-bottom:0.5rem">
-        <label>Betrag (Kloins) *</label>
-        <input type="text" id="fAmount" placeholder="z.B. 200" maxlength="7" value="100">
-      </div>
-      <div class="stake-hint">Dein Kontostand: <span class="kloins-val" id="kloinsBalance">…</span> Kloins</div>`;
-    document.getElementById('kloinsBalance').textContent = userKloins.toLocaleString('de-DE');
-  } else {
-    const suggestions = STAKE_SUGGESTIONS[id] || [];
-    fields.innerHTML = `
-      <div class="form-group" style="margin-bottom:0.4rem">
-        <label>${type.label} *</label>
-        <input type="text" id="fStakeDesc" placeholder="${type.placeholder}" maxlength="150">
-      </div>
-      ${suggestions.length ? `
-        <div class="suggestions" id="suggestionPills">
-          ${suggestions.map(s => `<button class="suggestion-pill" onclick="pickSuggestion('fStakeDesc','${s.replace(/'/g,"\\'")}')">${s}</button>`).join('')}
-        </div>` : ''}
-      ${type.hint ? `<div class="stake-hint" style="margin-top:0.5rem">${type.hint}</div>` : ''}`;
+function addStake(typeId) {
+  const uid = ++stakeUid;
+  stakeItems.push({ typeId, uid });
+  renderStakeList();
+  refreshAddButtons();
+  // Focus the new input
+  setTimeout(() => {
+    const el = document.getElementById('stake-input-' + uid);
+    if (el) el.focus();
+  }, 50);
+}
+
+function removeStake(uid) {
+  stakeItems = stakeItems.filter(s => s.uid !== uid);
+  renderStakeList();
+  refreshAddButtons();
+}
+
+function renderStakeList() {
+  const list = document.getElementById('stakeList');
+  if (stakeItems.length === 0) {
+    list.innerHTML = '<div class="stake-empty">Noch kein Einsatz — wähle oben eine Art.</div>';
+    return;
   }
+  list.innerHTML = stakeItems.map(s => {
+    const type = STAKE_TYPES.find(t => t.id === s.typeId);
+    const suggestions = STAKE_SUGGESTIONS[s.typeId] || [];
+    const pillsHtml = suggestions.length ? `
+      <div class="suggestions" id="sugg-${s.uid}">
+        ${suggestions.map(v => `<button class="suggestion-pill" onclick="pickSugg(${s.uid},'${v.replace(/'/g,"\\'")}')">${v}</button>`).join('')}
+      </div>` : '';
+
+    if (type.isKloins) {
+      return `<div class="stake-item" id="stake-item-${s.uid}">
+        <div class="stake-item-header">
+          <span class="stake-item-icon">${type.icon}</span>
+          <span class="stake-item-label">${type.label}</span>
+          <button class="stake-remove" onclick="removeStake(${s.uid})">×</button>
+        </div>
+        <input type="text" id="stake-input-${s.uid}" placeholder="Betrag (z.B. 200)" maxlength="7" value="100">
+        <div class="stake-kloins-hint">Kontostand: <span id="kbal-${s.uid}">${userKloins.toLocaleString('de-DE')}</span> Kloins</div>
+      </div>`;
+    } else {
+      return `<div class="stake-item" id="stake-item-${s.uid}">
+        <div class="stake-item-header">
+          <span class="stake-item-icon">${type.icon}</span>
+          <span class="stake-item-label">${type.label}</span>
+          <button class="stake-remove" onclick="removeStake(${s.uid})">×</button>
+        </div>
+        <input type="text" id="stake-input-${s.uid}" placeholder="${type.placeholder}" maxlength="150">
+        ${pillsHtml}
+      </div>`;
+    }
+  }).join('');
 }
 
-function pickSuggestion(inputId, value) {
-  const input = document.getElementById(inputId);
+function pickSugg(uid, value) {
+  const input = document.getElementById('stake-input-' + uid);
+  if (!input) return;
   input.value = value;
-  // Mark pill as used
-  document.querySelectorAll('#suggestionPills .suggestion-pill').forEach(p => {
+  document.querySelectorAll(`#sugg-${uid} .suggestion-pill`).forEach(p => {
     p.classList.toggle('used', p.textContent === value);
   });
   input.focus();
+}
+
+function buildSubmitPayload() {
+  // Returns {amount, stake_description} or null if invalid
+  const kloinsItem = stakeItems.find(s => s.typeId === 'kloins');
+  const otherItems = stakeItems.filter(s => s.typeId !== 'kloins');
+
+  let kloinsAmount = 0;
+  if (kloinsItem) {
+    kloinsAmount = parseInt((document.getElementById('stake-input-' + kloinsItem.uid)?.value || '').replace(/[^0-9]/g,''), 10);
+    if (!kloinsAmount || kloinsAmount <= 0) { showAlert('Bitte einen gültigen Kloins-Betrag eingeben.', 'error'); return null; }
+    if (kloinsAmount > userKloins) { showAlert(`Du hast nur ${userKloins.toLocaleString('de-DE')} Kloins.`, 'error'); return null; }
+  }
+
+  const stakes = [];
+  if (kloinsItem) stakes.push({ type: 'kloins', amount: kloinsAmount });
+
+  for (const item of otherItems) {
+    const val = document.getElementById('stake-input-' + item.uid)?.value.trim();
+    if (!val) {
+      const type = STAKE_TYPES.find(t => t.id === item.typeId);
+      showAlert(`Bitte Beschreibung für "${type.label}" eingeben.`, 'error');
+      return null;
+    }
+    stakes.push({ type: item.typeId, desc: val });
+  }
+
+  if (stakes.length === 0) { showAlert('Bitte mindestens einen Einsatz hinzufügen.', 'error'); return null; }
+
+  const amount = kloinsAmount || 1;
+  let stake_description;
+  if (stakes.length === 1 && stakes[0].type === 'kloins') {
+    stake_description = null; // kloins-only: no description
+  } else if (stakes.length === 1) {
+    stake_description = `${stakes[0].type}:${stakes[0].desc}`; // single non-kloins: typeId:desc
+  } else {
+    stake_description = JSON.stringify(stakes); // multiple stakes
+  }
+
+  return { amount, stake_description, kloinsAmount };
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Invite ────────────────────────────────────────────────────────────────────
+let inviteList = [];
+let inviteSearchTimer = null;
+const inviteUserMap = {};
+
+function onInviteSearch(q) {
+  clearTimeout(inviteSearchTimer);
+  const resultsEl = document.getElementById('inviteResults');
+  if (!q.trim()) { resultsEl.style.display = 'none'; return; }
+  inviteSearchTimer = setTimeout(() => searchInviteUsers(q.trim()), 300);
+}
+
+async function searchInviteUsers(q) {
+  const resultsEl = document.getElementById('inviteResults');
+  const { data } = await sb.from('profiles')
+    .select('id, username, avatar, avatar_url')
+    .ilike('username', `%${q}%`)
+    .neq('id', currentUser.id)
+    .limit(5);
+
+  if (!data || data.length === 0) { resultsEl.style.display = 'none'; return; }
+  const alreadyIds = new Set(inviteList.map(u => u.id));
+  const filtered = data.filter(u => !alreadyIds.has(u.id));
+  if (filtered.length === 0) { resultsEl.style.display = 'none'; return; }
+
+  filtered.forEach(u => { inviteUserMap[u.id] = u; });
+  resultsEl.innerHTML = filtered.map(u => {
+    const avHtml = u.avatar_url
+      ? `<img src="${escHtml(u.avatar_url)}" alt="">`
+      : `<span>${escHtml(u.avatar || '🎮')}</span>`;
+    return `<div class="invite-result-item" onclick="addInviteById('${u.id}')">${avHtml}<span>${escHtml(u.username)}</span></div>`;
+  }).join('');
+  resultsEl.style.display = '';
+}
+
+function addInviteById(userId) {
+  const user = inviteUserMap[userId];
+  if (!user) return;
+  if (!inviteList.find(u => u.id === userId)) {
+    inviteList.push(user);
+    renderInviteChips();
+  }
+  document.getElementById('inviteResults').style.display = 'none';
+  document.getElementById('inviteSearch').value = '';
+}
+
+function removeInvite(userId) {
+  inviteList = inviteList.filter(u => u.id !== userId);
+  renderInviteChips();
+}
+
+function renderInviteChips() {
+  document.getElementById('inviteChips').innerHTML = inviteList.map(u => {
+    const avHtml = u.avatar_url
+      ? `<img src="${escHtml(u.avatar_url)}" alt="">`
+      : escHtml(u.avatar || '🎮');
+    return `<div class="invite-chip">${avHtml} ${escHtml(u.username)}<button class="invite-chip-remove" onclick="removeInvite('${u.id}')">×</button></div>`;
+  }).join('');
 }
 
 async function init() {
@@ -423,7 +591,11 @@ async function init() {
     userKloins = profile.kloins ?? 1000;
   }
 
-  buildStakeTypes();
+  buildAddStakeTypes();
+
+  document.getElementById('inviteSearch').addEventListener('blur', () => {
+    setTimeout(() => { document.getElementById('inviteResults').style.display = 'none'; }, 150);
+  });
 
   // Sync side labels
   document.getElementById('fSideA').addEventListener('input', () => {
@@ -454,19 +626,9 @@ async function createBet() {
   if (endsAt && new Date(endsAt) <= new Date()) return showAlert('Enddatum muss in der Zukunft liegen.', 'error');
   if (!selectedSide) return showAlert('Bitte deine Seite wählen.', 'error');
 
-  const type = STAKE_TYPES.find(t => t.id === selectedStakeType);
-  let amount = 1;
-  let stakeDesc = null;
-
-  if (type.isKloins) {
-    amount = parseInt((document.getElementById('fAmount')?.value || '').replace(/[^0-9]/g, ''), 10);
-    if (!amount || amount <= 0) return showAlert('Bitte einen gültigen Kloins-Betrag eingeben.', 'error');
-    if (amount > userKloins)    return showAlert(`Du hast nur ${userKloins.toLocaleString('de-DE')} Kloins.`, 'error');
-  } else {
-    const descVal = document.getElementById('fStakeDesc')?.value.trim();
-    if (!descVal) return showAlert(`Bitte deinen ${type.label}-Einsatz beschreiben.`, 'error');
-    stakeDesc = `${type.id}:${descVal}`;
-  }
+  const stakePayload = buildSubmitPayload();
+  if (!stakePayload) return;
+  const { amount, stake_description: stakeDesc, kloinsAmount } = stakePayload;
 
   setBtnLoading(true);
 
@@ -490,8 +652,20 @@ async function createBet() {
 
   if (partErr) { setBtnLoading(false); return showAlert('Wette erstellt, Einsatz fehlgeschlagen: ' + partErr.message, 'error'); }
 
-  if (type.isKloins) {
-    await sb.from('profiles').update({ kloins: userKloins - amount }).eq('id', currentUser.id);
+  if (kloinsAmount > 0) {
+    await sb.from('profiles').update({ kloins: userKloins - kloinsAmount }).eq('id', currentUser.id);
+  }
+
+  // Send invitations
+  if (inviteList.length > 0) {
+    await sb.from('bet_invitations').insert(
+      inviteList.map(u => ({
+        bet_id: bet.id,
+        invited_by: currentUser.id,
+        invited_user_id: u.id,
+        status: 'pending'
+      }))
+    );
   }
 
   setBtnLoading(false);

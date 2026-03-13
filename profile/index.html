@@ -290,6 +290,22 @@
     z-index: 100; font-size: 2rem; animation: pulse 1s ease-in-out infinite;
   }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Invitations */
+  .invitations-section { margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.04s cubic-bezier(0.16,1,0.3,1) both; }
+  .invitation-card { background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.15); border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 0.7rem; }
+  .invitation-card-from { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.3rem; }
+  .invitation-card-from strong { color: var(--text); }
+  .invitation-card-title { font-size: 0.9rem; font-weight: 800; margin-bottom: 0.7rem; }
+  .invitation-actions { display: flex; gap: 0.5rem; }
+  .btn-inv-go { flex: 2; padding: 0.5rem 0.8rem; border-radius: 8px; border: none; background: var(--neon-blue); color: #000; font-family: inherit; font-size: 0.8rem; font-weight: 800; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.3rem; transition: all 0.2s; }
+  .btn-inv-go:hover { box-shadow: 0 0 14px rgba(0,212,255,0.4); }
+  .btn-inv-decline { flex: 1; padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: inherit; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .btn-inv-decline:hover { border-color: var(--neon-red); color: var(--neon-red); }
+
+  /* Navbar invite dot */
+  .nav-invite-dot { width: 8px; height: 8px; background: var(--neon-red); border-radius: 50%; position: absolute; top: -1px; right: -1px; box-shadow: 0 0 6px rgba(255,0,60,0.6); }
+  #navAvatar { position: relative; }
 </style>
 </head>
 <body>
@@ -363,6 +379,11 @@
 
     <div id="alertBox" class="alert"></div>
 
+    <div class="invitations-section" id="invitationsSection" style="display:none">
+      <div class="card-title" id="invitationsTitle" style="margin-bottom:0.8rem">📬 Einladungen</div>
+      <div id="invitationsList"></div>
+    </div>
+
     <div class="card">
       <div class="card-title">👤 Anzeigename</div>
       <div class="form-group">
@@ -408,6 +429,10 @@ let selectedEmoji = '🎮';
 let avatarImageUrl = null;
 let cropperInstance = null;
 
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = '../login/'; return; }
@@ -416,8 +441,59 @@ async function init() {
   buildEmojiPicker();
   setupFileInput();
   await loadProfile();
+  await loadInvitations();
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('mainPage').style.display = '';
+}
+
+async function loadInvitations() {
+  const { data: invitations } = await sb.from('bet_invitations')
+    .select('*, bets(id, title, side_a_label, side_b_label), profiles!invited_by(username, avatar, avatar_url)')
+    .eq('invited_user_id', currentUser.id)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false });
+
+  const section = document.getElementById('invitationsSection');
+  if (!invitations || invitations.length === 0) { section.style.display = 'none'; return; }
+
+  document.getElementById('invitationsTitle').textContent = `📬 Einladungen (${invitations.length})`;
+  document.getElementById('invitationsList').innerHTML = invitations.map(inv => {
+    const from = inv.profiles || {};
+    const bet = inv.bets || {};
+    const avHtml = from.avatar_url
+      ? `<img src="${esc(from.avatar_url)}" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle" alt=""> `
+      : `${esc(from.avatar || '🎮')} `;
+    return `<div class="invitation-card" id="inv-${inv.id}">
+      <div class="invitation-card-from">${avHtml}<strong>${esc(from.username || 'Unbekannt')}</strong> hat dich eingeladen:</div>
+      <div class="invitation-card-title">"${esc(bet.title || 'Unbekannte Wette')}"</div>
+      <div class="invitation-actions">
+        <a class="btn-inv-go" href="../bets/detail/?id=${esc(bet.id)}">Zur Wette →</a>
+        <button class="btn-inv-decline" onclick="declineInvitation('${inv.id}')">Ablehnen</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  section.style.display = '';
+
+  // Navbar dot if pending invitations exist
+  const navAvatar = document.getElementById('navAvatar');
+  if (!navAvatar.querySelector('.nav-invite-dot')) {
+    const dot = document.createElement('span');
+    dot.className = 'nav-invite-dot';
+    navAvatar.appendChild(dot);
+  }
+}
+
+async function declineInvitation(invId) {
+  await sb.from('bet_invitations').update({ status: 'declined' }).eq('id', invId);
+  document.getElementById('inv-' + invId)?.remove();
+  const remaining = document.querySelectorAll('.invitation-card').length;
+  if (remaining === 0) {
+    document.getElementById('invitationsSection').style.display = 'none';
+    document.getElementById('navAvatar').querySelector('.nav-invite-dot')?.remove();
+  } else {
+    document.getElementById('invitationsTitle').textContent = `📬 Einladungen (${remaining})`;
+  }
 }
 
 function buildEmojiPicker() {

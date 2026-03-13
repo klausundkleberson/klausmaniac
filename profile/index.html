@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -180,6 +181,22 @@
   .btn-upload:hover:not(:disabled) { box-shadow: 0 0 28px rgba(0,212,255,0.45); }
   .btn-upload:disabled { opacity: 0.4; cursor: not-allowed; }
 
+  .cropper-wrap {
+    display: none; margin-top: 0.75rem;
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border); background: #000;
+    max-height: 280px;
+  }
+  .cropper-wrap.show { display: block; }
+  .cropper-wrap img { max-width: 100%; display: block; }
+  .crop-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+  .btn-crop-cancel {
+    flex: 1; padding: 0.55rem; border: 1px solid var(--border); border-radius: 8px;
+    background: none; color: var(--muted); font-family: inherit; font-size: 0.8rem;
+    font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-crop-cancel:hover { border-color: var(--neon-red); color: var(--neon-red); }
+
   .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 1.8rem; margin-bottom: 1.2rem; animation: fadeUp 0.4s 0.05s cubic-bezier(0.16,1,0.3,1) both; }
 
   .card-title {
@@ -334,14 +351,13 @@
           <div class="upload-label">Bild auswählen oder hierher ziehen</div>
           <div class="upload-hint">JPG, PNG, GIF, WebP · max. 5 MB</div>
         </div>
-        <div class="upload-preview" id="uploadPreview">
-          <img id="previewImg" alt="Vorschau">
-          <div class="upload-preview-info">
-            <div class="upload-preview-name" id="previewName"></div>
-            <div class="upload-preview-size" id="previewSize"></div>
-          </div>
+        <div class="cropper-wrap" id="cropperWrap">
+          <img id="cropperImg" alt="">
         </div>
-        <button class="btn-upload" id="btnUpload" onclick="uploadImage()" disabled>Bild speichern →</button>
+        <div class="crop-actions" id="cropActions" style="display:none">
+          <button class="btn-crop-cancel" onclick="resetUpload()">Abbrechen</button>
+          <button class="btn-upload" id="btnUpload" onclick="uploadImage()" style="margin-top:0">Zuschneiden & speichern →</button>
+        </div>
       </div>
     </div>
 
@@ -377,6 +393,7 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 'use strict';
@@ -388,8 +405,8 @@ const EMOJIS = ['🎮','👾','🕹️','🏆','🔥','⚡','💀','👑','🦁'
 
 let currentUser = null;
 let selectedEmoji = '🎮';
-let selectedFile = null;
 let avatarImageUrl = null;
+let cropperInstance = null;
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
@@ -471,31 +488,52 @@ function handleFile(file) {
   if (!file.type.startsWith('image/')) { showAlert('Nur Bilddateien erlaubt.', 'error'); return; }
   if (file.size > 5 * 1024 * 1024) { showAlert('Bild zu groß – max. 5 MB erlaubt.', 'error'); return; }
 
-  selectedFile = file;
   const reader = new FileReader();
   reader.onload = e => {
-    document.getElementById('previewImg').src = e.target.result;
-    document.getElementById('previewName').textContent = file.name;
-    document.getElementById('previewSize').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
-    document.getElementById('uploadPreview').classList.add('show');
-    document.getElementById('btnUpload').disabled = false;
+    const cropperImg = document.getElementById('cropperImg');
+    cropperImg.src = e.target.result;
+
+    document.getElementById('cropperWrap').classList.add('show');
+    document.getElementById('cropActions').style.display = 'flex';
+
+    if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+    cropperInstance = new Cropper(cropperImg, {
+      aspectRatio: 1,
+      viewMode: 1,
+      dragMode: 'move',
+      autoCropArea: 0.9,
+      guides: false,
+      center: true,
+      highlight: false,
+      background: false,
+      cropBoxMovable: true,
+      cropBoxResizable: true,
+    });
   };
   reader.readAsDataURL(file);
 }
 
+function resetUpload() {
+  if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+  document.getElementById('cropperWrap').classList.remove('show');
+  document.getElementById('cropActions').style.display = 'none';
+  document.getElementById('fileInput').value = '';
+}
+
 async function uploadImage() {
-  if (!selectedFile) return;
+  if (!cropperInstance) return;
   const btn = document.getElementById('btnUpload');
   btn.disabled = true;
   btn.textContent = 'Lädt hoch…';
 
-  const ext = selectedFile.name.split('.').pop();
-  const path = `${currentUser.id}/avatar.${ext}`;
+  const canvas = cropperInstance.getCroppedCanvas({ width: 400, height: 400 });
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.9));
 
-  const { error: upErr } = await sb.storage.from('avatars').upload(path, selectedFile, { upsert: true, contentType: selectedFile.type });
+  const path = `${currentUser.id}/avatar.jpg`;
+  const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
   if (upErr) {
     showAlert('Upload fehlgeschlagen: ' + upErr.message, 'error');
-    btn.disabled = false; btn.textContent = 'Bild speichern →';
+    btn.disabled = false; btn.textContent = 'Zuschneiden & speichern →';
     return;
   }
 
@@ -507,11 +545,11 @@ async function uploadImage() {
   else {
     setAvatarImage(urlWithBust);
     showAlert('✓ Bild gespeichert!', 'success');
+    resetUpload();
     document.getElementById('emojiPicker').classList.remove('open');
   }
 
-  btn.disabled = false; btn.textContent = 'Bild speichern →';
-  selectedFile = null;
+  btn.disabled = false; btn.textContent = 'Zuschneiden & speichern →';
 }
 
 async function loadProfile() {
